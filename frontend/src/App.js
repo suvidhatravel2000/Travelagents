@@ -3,9 +3,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import DestinationPage from "./pages/DestinationPage";
 import PackageDetails from "./pages/PackageDetails";
+import SearchResults from "./pages/SearchResults";
 import Blog from "./pages/Blog";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import { Toaster } from "./components/ui/sonner";
 
 function App() {
   return (
@@ -15,11 +17,13 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/destination/:destinationId" element={<DestinationPage />} />
           <Route path="/package/:packageId" element={<PackageDetails />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </BrowserRouter>
+      <Toaster />
     </div>
   );
 }

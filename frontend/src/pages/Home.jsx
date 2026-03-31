@@ -14,6 +14,8 @@ const Home = () => {
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const packagesPerPage = 6;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,6 +76,12 @@ const Home = () => {
 
   const thailandPackages = packages.filter(pkg => pkg.destination === 'thailand');
   const ladakhPackages = packages.filter(pkg => pkg.destination === 'ladakh');
+  
+  // Pagination for trending destinations
+  const indexOfLastPackage = currentPage * packagesPerPage;
+  const indexOfFirstPackage = indexOfLastPackage - packagesPerPage;
+  const currentTrendingPackages = packages.slice(indexOfFirstPackage, indexOfLastPackage);
+  const totalPages = Math.ceil(packages.length / packagesPerPage);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -94,10 +102,33 @@ const Home = () => {
           <h2 className="text-3xl font-bold text-gray-900">Trending Destinations</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {packages.slice(0, 3).map(pkg => (
+          {currentTrendingPackages.map(pkg => (
             <PackageCard key={pkg.id} package={pkg} />
           ))}
         </div>
+        
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center space-x-4 mt-8">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Thailand Section */}

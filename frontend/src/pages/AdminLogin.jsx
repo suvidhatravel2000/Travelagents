@@ -1,23 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock } from 'lucide-react';
-import { companyInfo } from '../mockData';
+import { authAPI, settingsAPI } from '../api/client';
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState(null);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await settingsAPI.get();
+        setCompanyInfo(data);
+      } catch (err) {
+        console.error('Error fetching settings:', err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
     
-    // Mock authentication - will be replaced with real backend
-    if (username === 'admin' && password === 'admin123') {
+    try {
+      const response = await authAPI.login({ username, password });
       localStorage.setItem('adminLoggedIn', 'true');
+      localStorage.setItem('adminUser', JSON.stringify(response.user));
       navigate('/admin/dashboard');
-    } else {
-      setError('Invalid username or password');
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Invalid username or password');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,9 +93,10 @@ const AdminLogin = () => {
 
             <button
               type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition-colors"
+              disabled={loading}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
 
             <div className="text-center text-sm text-gray-600">
