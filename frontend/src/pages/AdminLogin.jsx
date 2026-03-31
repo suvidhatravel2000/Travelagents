@@ -49,7 +49,7 @@ const AdminLogin = () => {
               <Lock className="h-8 w-8 text-orange-500" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {companyInfo.name}
+              {companyInfo?.name || 'Suvidha Travel'}
             </h1>
             <p className="text-gray-600">Admin Dashboard Login</p>
           </div>
