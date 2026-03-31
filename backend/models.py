@@ -50,6 +50,10 @@ class PackageBase(BaseModel):
     validityDates: Optional[str] = ""
     additionalInfo: Optional[str] = ""
     termsConditions: Optional[List[str]] = []
+    
+    # Trending control
+    isTrending: Optional[bool] = False
+    trendingOrder: Optional[int] = None
 
 class PackageCreate(PackageBase):
     pass
@@ -68,6 +72,8 @@ class DestinationBase(BaseModel):
     name: str
     icon: str
     trending: bool = False
+    visible: bool = True
+    order: int = 0
 
 class DestinationCreate(DestinationBase):
     pass
@@ -90,9 +96,19 @@ class BannerBase(BaseModel):
     originalPrice: Optional[int] = None
     duration: Optional[str] = ""
     image: str
+    imageDesktop: Optional[str] = None  # Desktop-specific image
+    imageMobile: Optional[str] = None   # Mobile-specific image
     ctaText: str = "Book Now"
+    buttonText: Optional[str] = "BOOK NOW"
     active: bool = True
+    visible: bool = True
     order: int = 0
+    # Styling controls
+    titleFontSize: Optional[str] = "text-4xl"
+    titleColor: Optional[str] = "text-white"
+    subtitleFontSize: Optional[str] = "text-lg"
+    subtitleColor: Optional[str] = "text-gray-200"
+    textAlign: Optional[str] = "text-left"
 
 class BannerCreate(BannerBase):
     pass

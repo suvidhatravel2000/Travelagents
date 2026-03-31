@@ -1,16 +1,385 @@
-// Placeholder for banners editor
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical, Plus, Trash2, Save, Eye, EyeOff, Monitor, Smartphone } from 'lucide-react';
+import { bannersAPI } from '../../api/client';
+
+const SortableBanner = ({ banner, onUpdate, onDelete }) => {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: banner.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-white border rounded-lg p-5 mb-4"
+    >
+      <div className="flex items-start space-x-4">
+        {/* Drag Handle */}
+        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing pt-2">
+          <GripVertical className="h-6 w-6 text-gray-400" />
+        </div>
+
+        <div className="flex-1 space-y-4">
+          {/* Title & Description */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <input
+                type="text"
+                value={banner.title || ''}
+                onChange={(e) => onUpdate(banner.id, 'title', e.target.value)}
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+                placeholder="Banner title"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
+              <input
+                type="text"
+                value={banner.subtitle || ''}
+                onChange={(e) => onUpdate(banner.id, 'subtitle', e.target.value)}
+                className="w-full px-3 py-2 border rounded"
+                placeholder="Subtitle"
+              />
+            </div>
+          </div>
+
+          {/* Desktop Image */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center space-x-2">
+              <Monitor className="h-4 w-4" />
+              <span>Desktop Image URL</span>
+            </label>
+            <input
+              type="text"
+              value={banner.imageDesktop || banner.image || ''}
+              onChange={(e) => onUpdate(banner.id, 'imageDesktop', e.target.value)}
+              className="w-full px-3 py-2 border rounded"
+              placeholder="https://example.com/banner-desktop.jpg"
+            />
+          </div>
+
+          {/* Mobile Image */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center space-x-2">
+              <Smartphone className="h-4 w-4" />
+              <span>Mobile Image URL (Optional)</span>
+            </label>
+            <input
+              type="text"
+              value={banner.imageMobile || ''}
+              onChange={(e) => onUpdate(banner.id, 'imageMobile', e.target.value)}
+              className="w-full px-3 py-2 border rounded"
+              placeholder="https://example.com/banner-mobile.jpg (optional)"
+            />
+          </div>
+
+          {/* Advanced Styling Toggle */}
+          <button
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            {showAdvanced ? '▼ Hide' : '▶ Show'} Advanced Styling
+          </button>
+
+          {/* Advanced Styling Controls */}
+          {showAdvanced && (
+            <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+              {/* Font Size */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Title Font Size</label>
+                <select
+                  value={banner.titleFontSize || 'text-4xl'}
+                  onChange={(e) => onUpdate(banner.id, 'titleFontSize', e.target.value)}
+                  className="w-full px-2 py-1 border rounded text-sm"
+                >
+                  <option value="text-2xl">Small (2xl)</option>
+                  <option value="text-3xl">Medium (3xl)</option>
+                  <option value="text-4xl">Large (4xl)</option>
+                  <option value="text-5xl">XL (5xl)</option>
+                  <option value="text-6xl">2XL (6xl)</option>
+                </select>
+              </div>
+
+              {/* Font Color */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Title Color</label>
+                <select
+                  value={banner.titleColor || 'text-white'}
+                  onChange={(e) => onUpdate(banner.id, 'titleColor', e.target.value)}
+                  className="w-full px-2 py-1 border rounded text-sm"
+                >
+                  <option value="text-white">White</option>
+                  <option value="text-black">Black</option>
+                  <option value="text-yellow-400">Yellow</option>
+                  <option value="text-orange-500">Orange</option>
+                  <option value="text-blue-600">Blue</option>
+                </select>
+              </div>
+
+              {/* Text Alignment */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Text Alignment</label>
+                <select
+                  value={banner.textAlign || 'text-left'}
+                  onChange={(e) => onUpdate(banner.id, 'textAlign', e.target.value)}
+                  className="w-full px-2 py-1 border rounded text-sm"
+                >
+                  <option value="text-left">Left</option>
+                  <option value="text-center">Center</option>
+                  <option value="text-right">Right</option>
+                </select>
+              </div>
+
+              {/* Subtitle Font Size */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Subtitle Font Size</label>
+                <select
+                  value={banner.subtitleFontSize || 'text-lg'}
+                  onChange={(e) => onUpdate(banner.id, 'subtitleFontSize', e.target.value)}
+                  className="w-full px-2 py-1 border rounded text-sm"
+                >
+                  <option value="text-sm">Small</option>
+                  <option value="text-base">Base</option>
+                  <option value="text-lg">Large</option>
+                  <option value="text-xl">XL</option>
+                </select>
+              </div>
+
+              {/* Subtitle Color */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Subtitle Color</label>
+                <select
+                  value={banner.subtitleColor || 'text-gray-200'}
+                  onChange={(e) => onUpdate(banner.id, 'subtitleColor', e.target.value)}
+                  className="w-full px-2 py-1 border rounded text-sm"
+                >
+                  <option value="text-white">White</option>
+                  <option value="text-gray-200">Light Gray</option>
+                  <option value="text-gray-800">Dark Gray</option>
+                  <option value="text-yellow-300">Yellow</option>
+                </select>
+              </div>
+
+              {/* Button Text */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Button Text</label>
+                <input
+                  type="text"
+                  value={banner.buttonText || 'BOOK NOW'}
+                  onChange={(e) => onUpdate(banner.id, 'buttonText', e.target.value)}
+                  className="w-full px-2 py-1 border rounded text-sm"
+                  placeholder="BOOK NOW"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-col space-y-2">
+          <button
+            onClick={() => onUpdate(banner.id, 'visible', !banner.visible)}
+            className="text-gray-600 hover:text-gray-800"
+            title={banner.visible ? 'Visible' : 'Hidden'}
+          >
+            {banner.visible ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+          </button>
+          <button
+            onClick={() => onDelete(banner.id)}
+            className="text-red-600 hover:text-red-800"
+          >
+            <Trash2 className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const BannersEditor = () => {
+  const [banners, setBanners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  useEffect(() => {
+    fetchBanners();
+  }, []);
+
+  const fetchBanners = async () => {
+    try {
+      const data = await bannersAPI.getAll();
+      setBanners(data.sort((a, b) => (a.order || 0) - (b.order || 0)));
+    } catch (err) {
+      console.error('Error fetching banners:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      setBanners((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  const handleUpdate = (id, field, value) => {
+    setBanners((prev) =>
+      prev.map((banner) =>
+        banner.id === id ? { ...banner, [field]: value } : banner
+      )
+    );
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm('Delete this banner?')) {
+      setBanners((prev) => prev.filter((b) => b.id !== id));
+    }
+  };
+
+  const handleAddBanner = () => {
+    const newBanner = {
+      id: `banner-${Date.now()}`,
+      title: 'New Banner',
+      subtitle: 'Subtitle text',
+      imageDesktop: '',
+      imageMobile: '',
+      visible: true,
+      order: banners.length,
+      titleFontSize: 'text-4xl',
+      titleColor: 'text-white',
+      subtitleFontSize: 'text-lg',
+      subtitleColor: 'text-gray-200',
+      textAlign: 'text-left',
+      buttonText: 'BOOK NOW'
+    };
+    setBanners((prev) => [...prev, newBanner]);
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const updatedBanners = banners.map((banner, index) => ({
+        ...banner,
+        order: index,
+        image: banner.imageDesktop // Backward compatibility
+      }));
+
+      await Promise.all(
+        updatedBanners.map(async (banner) => {
+          if (banner.id.startsWith('banner-')) {
+            await bannersAPI.create(banner);
+          } else {
+            await bannersAPI.update(banner.id, banner);
+          }
+        })
+      );
+
+      alert('✅ Banners saved!');
+      fetchBanners();
+    } catch (err) {
+      console.error('Error saving banners:', err);
+      alert('Failed to save banners');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="p-6">Loading...</div>;
+
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-xl font-semibold mb-4">Hero Banners Editor</h2>
-      <p className="text-gray-600 mb-4">Manage your homepage hero banners with full customization.</p>
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-sm text-blue-800">
-          📝 Coming soon: Upload images, edit text, customize styling, and control banner display order.
-        </p>
+    <div className="bg-gray-50 rounded-lg shadow p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Hero Banners Editor</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Drag to reorder • Supports desktop + mobile images • Advanced styling controls
+          </p>
+        </div>
+        <div className="flex space-x-3">
+          <button
+            onClick={handleAddBanner}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Add Banner</span>
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            <Save className="h-5 w-5" />
+            <span>{saving ? 'Saving...' : 'Save All'}</span>
+          </button>
+        </div>
       </div>
+
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={banners.map(b => b.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {banners.map((banner) => (
+            <SortableBanner
+              key={banner.id}
+              banner={banner}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
+
+      {banners.length === 0 && (
+        <div className="text-center py-12 bg-white rounded-lg">
+          <p className="text-gray-500 mb-4">No banners yet</p>
+          <button
+            onClick={handleAddBanner}
+            className="text-blue-600 hover:text-blue-800"
+          >
+            Create your first banner
+          </button>
+        </div>
+      )}
     </div>
   );
 };

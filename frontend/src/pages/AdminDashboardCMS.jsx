@@ -23,6 +23,8 @@ import TopBarEditor from '../components/admin/TopBarEditor';
 import BannersEditor from '../components/admin/BannersEditor';
 import FooterEditor from '../components/admin/FooterEditor';
 import SectionVisibilityControl from '../components/admin/SectionVisibilityControl';
+import DestinationsEditor from '../components/admin/DestinationsEditor';
+import TrendingPackagesEditor from '../components/admin/TrendingPackagesEditor';
 
 const AdminDashboardCMS = () => {
   const navigate = useNavigate();
@@ -147,7 +149,17 @@ const AdminDashboardCMS = () => {
             }`}
           >
             <MapPin className="h-5 w-5" />
-            <span>Destinations</span>
+            <span>Destination Tabs</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('trending')}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              activeTab === 'trending' ? 'bg-orange-500' : 'hover:bg-gray-800'
+            }`}
+          >
+            <Package className="h-5 w-5" />
+            <span>Trending Packages</span>
           </button>
 
           <button
@@ -199,7 +211,8 @@ const AdminDashboardCMS = () => {
             {activeTab === 'topbar' && 'Top Bar Control'}
             {activeTab === 'banners' && 'Hero Banners'}
             {activeTab === 'packages' && 'Packages Management'}
-            {activeTab === 'destinations' && 'Destinations Management'}
+            {activeTab === 'destinations' && 'Destination Tabs'}
+            {activeTab === 'trending' && 'Trending Packages'}
             {activeTab === 'footer' && 'Footer Control'}
             {activeTab === 'visibility' && 'Section Visibility'}
             {activeTab === 'settings' && 'Company Settings'}
@@ -266,6 +279,8 @@ const AdminDashboardCMS = () => {
         {activeTab === 'topbar' && <TopBarEditor />}
         {activeTab === 'banners' && <BannersEditor />}
         {activeTab === 'packages' && <PackagesManager />}
+        {activeTab === 'destinations' && <DestinationsEditor />}
+        {activeTab === 'trending' && <TrendingPackagesEditor />}
         {activeTab === 'footer' && <FooterEditor />}
         {activeTab === 'visibility' && <SectionVisibilityControl />}
         
