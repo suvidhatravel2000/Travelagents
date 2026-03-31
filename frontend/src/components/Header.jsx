@@ -12,7 +12,7 @@ const Header = () => {
     <>
       {/* Top Announcement Bar */}
       <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-center py-2 px-4 text-sm font-medium">
-        Thailand Summer Special With Flights @ ₹38999
+        Contact No: {companyInfo.phones.join(' | ')} &nbsp;&nbsp;|&nbsp;&nbsp; Email: {companyInfo.emails[0]}
       </div>
 
       {/* Main Header */}

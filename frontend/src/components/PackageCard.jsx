@@ -1,16 +1,21 @@
 import React from 'react';
-import { Phone, Star, Plane, Users } from 'lucide-react';
-import { companyInfo } from '../mockData';
+import { Eye, Star, Plane, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const PackageCard = ({ package: pkg }) => {
-  const handleGetInTouch = () => {
-    window.location.href = `tel:${companyInfo.phones[0]}`;
+  const navigate = useNavigate();
+
+  const handleViewDetails = () => {
+    navigate(`/package/${pkg.id}`);
   };
 
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 group">
       {/* Image Container */}
-      <div className="relative overflow-hidden">
+      <div 
+        className="relative overflow-hidden cursor-pointer"
+        onClick={handleViewDetails}
+      >
         <img
           src={pkg.image}
           alt={pkg.title}
@@ -76,11 +81,11 @@ const PackageCard = ({ package: pkg }) => {
 
         {/* CTA Button */}
         <button
-          onClick={handleGetInTouch}
+          onClick={handleViewDetails}
           className="w-full flex items-center justify-center space-x-2 border-2 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white py-2 rounded-md transition-colors duration-300 font-medium"
         >
-          <Phone className="h-4 w-4" />
-          <span>Get In Touch</span>
+          <Eye className="h-4 w-4" />
+          <span>View Details</span>
         </button>
       </div>
     </div>

@@ -251,7 +251,7 @@ export const heroBanners = [
 export const companyInfo = {
   name: 'Suvidha Travel',
   phones: ['+91 8585997177', '+91-9911061103'],
-  emails: ['anshul@suvidhatravel.com', 'suvidhatravel2000@gmail.com'],
+  emails: ['info@suvidhatravel.com', 'anshul@suvidhatravel.com', 'suvidhatravel2000@gmail.com'],
   address: '1440, Galaxy Diamond Plaza, Sec - 4 Near Gaur City Mall Greater Noida (West) Uttar Pradesh Pin Code 201009',
   website: 'https://suvidhatravel.com'
 };
