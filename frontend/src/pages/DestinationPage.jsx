@@ -1,17 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import DestinationNav from '../components/DestinationNav';
 import PackageCard from '../components/PackageCard';
 import Footer from '../components/Footer';
-import { packages } from '../mockData';
+import { packagesAPI } from '../api/client';
 
 const DestinationPage = () => {
   const { destinationId } = useParams();
+  const [packages, setPackages] = useState([]);
+  const [loading, setLoading] = useState(true);
   
-  const destinationPackages = packages.filter(pkg => pkg.destination === destinationId);
-  const destinationName = destinationPackages.length > 0 
-    ? destinationPackages[0].category 
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        setLoading(true);
+        const data = await packagesAPI.getAll(destinationId);
+        setPackages(data);
+      } catch (err) {
+        console.error('Error fetching packages:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPackages();
+  }, [destinationId]);
+
+  const destinationName = packages.length > 0 
+    ? packages[0].category 
     : destinationId.charAt(0).toUpperCase() + destinationId.slice(1);
 
   return (
@@ -24,9 +41,13 @@ const DestinationPage = () => {
           {destinationName} Packages
         </h1>
 
-        {destinationPackages.length > 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+          </div>
+        ) : packages.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {destinationPackages.map(pkg => (
+            {packages.map(pkg => (
               <PackageCard key={pkg.id} package={pkg} />
             ))}
           </div>

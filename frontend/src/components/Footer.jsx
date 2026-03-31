@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
-import { companyInfo } from '../mockData';
+import { settingsAPI } from '../api/client';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
+  const [companyInfo, setCompanyInfo] = useState(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await settingsAPI.get();
+        setCompanyInfo(data);
+      } catch (err) {
+        console.error('Error fetching settings:', err);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  if (!companyInfo) {
+    return null;
+  }
   return (
     <footer className="bg-gray-900 text-gray-300 pt-12 pb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

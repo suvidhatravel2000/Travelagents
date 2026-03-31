@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -14,15 +14,55 @@ import {
 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { packages, companyInfo } from '../mockData';
+import { packagesAPI, settingsAPI } from '../api/client';
 
 const PackageDetails = () => {
   const { packageId } = useParams();
   const navigate = useNavigate();
   
-  const pkg = packages.find(p => p.id === packageId);
+  const [pkg, setPkg] = useState(null);
+  const [companyInfo, setCompanyInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  if (!pkg) {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [packageData, settings] = await Promise.all([
+          packagesAPI.getById(packageId),
+          settingsAPI.get()
+        ]);
+        setPkg(packageData);
+        setCompanyInfo(settings);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching package:', err);
+        setError('Package not found');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [packageId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading package details...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !pkg) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
@@ -40,8 +80,8 @@ const PackageDetails = () => {
     );
   }
 
-  // Mock itinerary data - will come from backend later
-  const itinerary = [
+  // Use itinerary from package or default
+  const itinerary = pkg.itinerary && pkg.itinerary.length > 0 ? pkg.itinerary : [
     { day: 1, title: 'Arrival & Check-in', description: 'Arrive at destination, hotel check-in, and evening leisure time.' },
     { day: 2, title: 'City Tour', description: 'Full day guided city tour covering major attractions and landmarks.' },
     { day: 3, title: 'Adventure Activities', description: 'Experience thrilling adventure activities and local cuisine.' },
@@ -49,7 +89,7 @@ const PackageDetails = () => {
     { day: 5, title: 'Departure', description: 'Check-out and departure with wonderful memories.' }
   ];
 
-  const inclusions = [
+  const inclusions = pkg.inclusions && pkg.inclusions.length > 0 ? pkg.inclusions : [
     'Accommodation in selected hotels',
     'Daily breakfast',
     'Airport transfers',
@@ -57,7 +97,7 @@ const PackageDetails = () => {
     'All taxes and service charges'
   ];
 
-  const exclusions = [
+  const exclusions = pkg.exclusions && pkg.exclusions.length > 0 ? pkg.exclusions : [
     'Airfare (unless specified)',
     'Personal expenses',
     'Travel insurance',
@@ -137,10 +177,10 @@ const PackageDetails = () => {
               <div className="border-t pt-4">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">Package Overview</h2>
                 <p className="text-gray-700 leading-relaxed">
-                  Experience the best of {pkg.category} with this carefully curated package. 
+                  {pkg.overview || `Experience the best of ${pkg.category} with this carefully curated package. 
                   Enjoy comfortable accommodations, guided tours, and unforgettable experiences 
                   that will create memories to last a lifetime. This package is designed to give 
-                  you the perfect blend of adventure, relaxation, and cultural immersion.
+                  you the perfect blend of adventure, relaxation, and cultural immersion.`}
                 </p>
               </div>
             </div>

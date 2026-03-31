@@ -1,12 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Menu, X, ChevronDown } from 'lucide-react';
-import { companyInfo } from '../mockData';
+import { settingsAPI } from '../api/client';
 
 const Header = () => {
+  const [companyInfo, setCompanyInfo] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [indiaHolidaysOpen, setIndiaHolidaysOpen] = useState(false);
   const [internationalHolidaysOpen, setInternationalHolidaysOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await settingsAPI.get();
+        setCompanyInfo(data);
+      } catch (err) {
+        console.error('Error fetching settings:', err);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  if (!companyInfo) {
+    return null; // Or a loading skeleton
+  }
 
   return (
     <>

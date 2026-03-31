@@ -1,11 +1,25 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Flame } from 'lucide-react';
-import { destinations } from '../mockData';
+import { destinationsAPI } from '../api/client';
 import { useNavigate } from 'react-router-dom';
 
 const DestinationNav = () => {
   const scrollContainerRef = useRef(null);
   const navigate = useNavigate();
+  const [destinations, setDestinations] = useState([]);
+
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      try {
+        const data = await destinationsAPI.getAll();
+        setDestinations(data);
+      } catch (err) {
+        console.error('Error fetching destinations:', err);
+      }
+    };
+
+    fetchDestinations();
+  }, []);
 
   const scroll = (direction) => {
     const container = scrollContainerRef.current;
