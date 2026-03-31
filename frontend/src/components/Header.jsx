@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Menu, X, ChevronDown } from 'lucide-react';
 import { settingsAPI } from '../api/client';
+import { cmsAPI } from '../api/cms';
 
 const Header = () => {
   const [companyInfo, setCompanyInfo] = useState(null);
+  const [topBar, setTopBar] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [indiaHolidaysOpen, setIndiaHolidaysOpen] = useState(false);
   const [internationalHolidaysOpen, setInternationalHolidaysOpen] = useState(false);
@@ -12,8 +14,12 @@ const Header = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const data = await settingsAPI.get();
+        const [data, topBarData] = await Promise.all([
+          settingsAPI.get(),
+          cmsAPI.getTopBar()
+        ]);
         setCompanyInfo(data);
+        setTopBar(topBarData);
       } catch (err) {
         console.error('Error fetching settings:', err);
       }
@@ -23,15 +29,24 @@ const Header = () => {
   }, []);
 
   if (!companyInfo) {
-    return null; // Or a loading skeleton
+    return null;
   }
 
   return (
     <>
       {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-center py-2 px-4 text-sm font-medium">
-        Contact No: {companyInfo.phones.join(' | ')} &nbsp;&nbsp;|&nbsp;&nbsp; Email: {companyInfo.emails[0]}
-      </div>
+      {topBar && topBar.visible && (
+        <div 
+          className="text-center py-2 px-4 text-sm font-medium"
+          style={{
+            backgroundColor: topBar.backgroundColor,
+            color: topBar.textColor,
+            fontSize: topBar.fontSize
+          }}
+        >
+          {topBar.text}
+        </div>
+      )}
 
       {/* Main Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">

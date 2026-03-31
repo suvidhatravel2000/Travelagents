@@ -7,6 +7,7 @@ import SearchResults from "./pages/SearchResults";
 import Blog from "./pages/Blog";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboardCMS from "./pages/AdminDashboardCMS";
 import { Toaster } from "./components/ui/sonner";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/cms" element={<AdminDashboardCMS />} />
         </Routes>
       </BrowserRouter>
       <Toaster />

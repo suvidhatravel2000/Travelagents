@@ -32,7 +32,7 @@ const AdminLogin = () => {
       const response = await authAPI.login({ username, password });
       localStorage.setItem('adminLoggedIn', 'true');
       localStorage.setItem('adminUser', JSON.stringify(response.user));
-      navigate('/admin/dashboard');
+      navigate('/admin/cms');
     } catch (err) {
       setError(err.response?.data?.detail || 'Invalid username or password');
     } finally {
