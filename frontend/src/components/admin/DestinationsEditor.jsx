@@ -169,30 +169,34 @@ const DestinationsEditor = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
+      
       // Update order based on current positions
       const updatedDestinations = destinations.map((dest, index) => ({
         ...dest,
         order: index
       }));
 
-      // Save each destination (in production, use batch update API)
-      await Promise.all(
-        updatedDestinations.map(async (dest) => {
-          if (dest.id.startsWith('dest-')) {
-            // New destination - create
-            await destinationsAPI.create(dest);
-          } else {
-            // Existing destination - update
-            await destinationsAPI.update(dest.id, dest);
-          }
-        })
-      );
+      // Separate new and existing destinations
+      const newDests = updatedDestinations.filter(d => d.id.startsWith('dest-'));
+      const existingDests = updatedDestinations.filter(d => !d.id.startsWith('dest-'));
+
+      // Update existing destinations
+      for (const dest of existingDests) {
+        await destinationsAPI.update(dest.id, dest);
+      }
+
+      // Create new destinations (with generated IDs)
+      for (const dest of newDests) {
+        const { id, ...destData } = dest; // Remove temp ID
+        const newId = destData.name.toLowerCase().replace(/\s+/g, '-');
+        await destinationsAPI.create({ ...destData, id: newId });
+      }
 
       alert('✅ Destinations saved successfully!');
       fetchDestinations(); // Refresh
     } catch (err) {
       console.error('Error saving destinations:', err);
-      alert('Failed to save destinations');
+      alert('Failed to save destinations: ' + err.message);
     } finally {
       setSaving(false);
     }

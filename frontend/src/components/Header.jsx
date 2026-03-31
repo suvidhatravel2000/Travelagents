@@ -10,6 +10,28 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [indiaHolidaysOpen, setIndiaHolidaysOpen] = useState(false);
   const [internationalHolidaysOpen, setInternationalHolidaysOpen] = useState(false);
+  const [indiaTimeout, setIndiaTimeout] = useState(null);
+  const [intlTimeout, setIntlTimeout] = useState(null);
+
+  const handleIndiaEnter = () => {
+    if (indiaTimeout) clearTimeout(indiaTimeout);
+    setIndiaHolidaysOpen(true);
+  };
+
+  const handleIndiaLeave = () => {
+    const timeout = setTimeout(() => setIndiaHolidaysOpen(false), 200);
+    setIndiaTimeout(timeout);
+  };
+
+  const handleIntlEnter = () => {
+    if (intlTimeout) clearTimeout(intlTimeout);
+    setInternationalHolidaysOpen(true);
+  };
+
+  const handleIntlLeave = () => {
+    const timeout = setTimeout(() => setInternationalHolidaysOpen(false), 200);
+    setIntlTimeout(timeout);
+  };
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -64,8 +86,8 @@ const Header = () => {
               {/* India Holidays Dropdown */}
               <div 
                 className="relative"
-                onMouseEnter={() => setIndiaHolidaysOpen(true)}
-                onMouseLeave={() => setIndiaHolidaysOpen(false)}
+                onMouseEnter={handleIndiaEnter}
+                onMouseLeave={handleIndiaLeave}
               >
                 <button className="flex items-center text-gray-700 hover:text-orange-500 transition-colors">
                   India Holidays
@@ -92,8 +114,8 @@ const Header = () => {
               {/* International Holidays Dropdown */}
               <div 
                 className="relative"
-                onMouseEnter={() => setInternationalHolidaysOpen(true)}
-                onMouseLeave={() => setInternationalHolidaysOpen(false)}
+                onMouseEnter={handleIntlEnter}
+                onMouseLeave={handleIntlLeave}
               >
                 <button className="flex items-center text-gray-700 hover:text-orange-500 transition-colors">
                   International Holidays

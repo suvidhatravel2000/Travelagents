@@ -13,11 +13,14 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Plus, Trash2, Save, Eye, EyeOff, Monitor, Smartphone } from 'lucide-react';
+import { GripVertical, Plus, Trash2, Save, Eye, EyeOff, Monitor, Smartphone, Image as ImageIcon } from 'lucide-react';
 import { bannersAPI } from '../../api/client';
+import MediaGallery from './MediaGallery';
 
 const SortableBanner = ({ banner, onUpdate, onDelete }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const [mediaTarget, setMediaTarget] = useState(null); // 'desktop' or 'mobile'
 
   const {
     attributes,
@@ -73,9 +76,23 @@ const SortableBanner = ({ banner, onUpdate, onDelete }) => {
 
           {/* Desktop Image */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center space-x-2">
-              <Monitor className="h-4 w-4" />
-              <span>Desktop Image URL</span>
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Monitor className="h-4 w-4" />
+                <span>Desktop Image URL</span>
+                <span className="text-xs text-gray-500">(Recommended: 1920x1080px or 16:9 ratio)</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setMediaTarget('desktop');
+                  setShowMediaGallery(true);
+                }}
+                className="text-blue-600 hover:text-blue-800 flex items-center space-x-1 text-xs"
+              >
+                <ImageIcon className="h-4 w-4" />
+                <span>Browse Gallery</span>
+              </button>
             </label>
             <input
               type="text"
@@ -88,18 +105,47 @@ const SortableBanner = ({ banner, onUpdate, onDelete }) => {
 
           {/* Mobile Image */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center space-x-2">
-              <Smartphone className="h-4 w-4" />
-              <span>Mobile Image URL (Optional)</span>
+            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Smartphone className="h-4 w-4" />
+                <span>Mobile Image URL (Optional)</span>
+                <span className="text-xs text-gray-500">(Recommended: 1080x1920px or 9:16 ratio)</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setMediaTarget('mobile');
+                  setShowMediaGallery(true);
+                }}
+                className="text-blue-600 hover:text-blue-800 flex items-center space-x-1 text-xs"
+              >
+                <ImageIcon className="h-4 w-4" />
+                <span>Browse Gallery</span>
+              </button>
             </label>
             <input
               type="text"
               value={banner.imageMobile || ''}
               onChange={(e) => onUpdate(banner.id, 'imageMobile', e.target.value)}
               className="w-full px-3 py-2 border rounded"
-              placeholder="https://example.com/banner-mobile.jpg (optional)"
+              placeholder="https://example.com/banner-mobile.jpg (optional - desktop used if empty)"
             />
           </div>
+
+          {/* Media Gallery Modal */}
+          {showMediaGallery && (
+            <MediaGallery
+              onSelectImage={(imageUrl) => {
+                if (mediaTarget === 'desktop') {
+                  onUpdate(banner.id, 'imageDesktop', imageUrl);
+                } else {
+                  onUpdate(banner.id, 'imageMobile', imageUrl);
+                }
+                setShowMediaGallery(false);
+              }}
+              onClose={() => setShowMediaGallery(false)}
+            />
+          )}
 
           {/* Advanced Styling Toggle */}
           <button
@@ -296,24 +342,31 @@ const BannersEditor = () => {
       const updatedBanners = banners.map((banner, index) => ({
         ...banner,
         order: index,
-        image: banner.imageDesktop // Backward compatibility
+        image: banner.imageDesktop || banner.image, // Backward compatibility
+        destination: banner.destination || 'general', // Required field
+        ctaText: banner.buttonText || banner.ctaText || 'BOOK NOW'
       }));
 
-      await Promise.all(
-        updatedBanners.map(async (banner) => {
-          if (banner.id.startsWith('banner-')) {
-            await bannersAPI.create(banner);
-          } else {
-            await bannersAPI.update(banner.id, banner);
-          }
-        })
-      );
+      // Separate new and existing banners
+      const newBanners = updatedBanners.filter(b => b.id.startsWith('banner-'));
+      const existingBanners = updatedBanners.filter(b => !b.id.startsWith('banner-'));
+
+      // Update existing banners
+      for (const banner of existingBanners) {
+        await bannersAPI.update(banner.id, banner);
+      }
+
+      // Create new banners
+      for (const banner of newBanners) {
+        const { id, ...bannerData } = banner; // Remove temp ID
+        await bannersAPI.create(bannerData);
+      }
 
       alert('✅ Banners saved!');
       fetchBanners();
     } catch (err) {
       console.error('Error saving banners:', err);
-      alert('Failed to save banners');
+      alert('Failed to save banners: ' + (err.response?.data?.detail || err.message));
     } finally {
       setSaving(false);
     }

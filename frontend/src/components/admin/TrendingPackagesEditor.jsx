@@ -128,26 +128,31 @@ const TrendingPackagesEditor = () => {
     try {
       setSaving(true);
 
-      // Update all packages
-      const updates = allPackages.map(async (pkg) => {
+      // Update all packages - mark trending and set order
+      const allUpdates = allPackages.map(async (pkg) => {
         const isTrending = trendingPackages.some(tp => tp.id === pkg.id);
         const trendingOrder = isTrending 
           ? trendingPackages.findIndex(tp => tp.id === pkg.id) 
           : null;
 
-        await packagesAPI.update(pkg.id, {
-          ...pkg,
-          isTrending,
-          trendingOrder
-        });
+        try {
+          await packagesAPI.update(pkg.id, {
+            ...pkg,
+            isTrending,
+            trendingOrder
+          });
+        } catch (err) {
+          console.error(`Failed to update package ${pkg.id}:`, err);
+          throw err;
+        }
       });
 
-      await Promise.all(updates);
+      await Promise.all(allUpdates);
       alert('✅ Trending packages order saved!');
-      fetchPackages(); // Refresh
+      await fetchPackages(); // Refresh
     } catch (err) {
       console.error('Error saving trending packages:', err);
-      alert('Failed to save trending packages');
+      alert('Failed to save trending packages: ' + (err.message || 'Unknown error'));
     } finally {
       setSaving(false);
     }
