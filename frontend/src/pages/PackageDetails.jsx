@@ -199,42 +199,65 @@ const PackageDetails = () => {
             {/* Pricing Table */}
             {pkg.pricingTable && pkg.pricingTable.length > 0 && (
               <div className="bg-white rounded-lg p-6 mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Package Pricing</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Hotel to be Use</h2>
+                <p className="text-sm text-gray-700 mb-6">
+                  BELOW RATES ARE PER PERSON NET & NON COMMISSIONABLE
+                </p>
+                
                 <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
+                  <table className="w-full" style={{ borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border border-gray-300 px-4 py-3 text-left font-semibold">Category</th>
-                        <th className="border border-gray-300 px-4 py-3 text-center font-semibold">2 Pax</th>
-                        <th className="border border-gray-300 px-4 py-3 text-center font-semibold">4 Pax</th>
-                        <th className="border border-gray-300 px-4 py-3 text-center font-semibold">6 Pax</th>
-                        <th className="border border-gray-300 px-4 py-3 text-center font-semibold">Extra Bed</th>
+                      <tr style={{ backgroundColor: '#d1d5db' }}>
+                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                          Category
+                        </th>
+                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                          Per Person (Min 2 Pax)
+                        </th>
+                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                          Per Person (Min 4 Pax)
+                        </th>
+                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                          Per Person (Min 6 Pax)
+                        </th>
+                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                          Extra bed
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {pkg.pricingTable.map((row, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50">
-                          <td className="border border-gray-300 px-4 py-3 font-medium">{row.category}</td>
-                          <td className="border border-gray-300 px-4 py-3 text-center">
-                            {row.price2Pax ? `₹${row.price2Pax.toLocaleString('en-IN')}` : '-'}
+                        <tr key={idx}>
+                          <td className="border border-gray-400 px-6 py-4 font-semibold text-gray-900">
+                            {row.category}
                           </td>
-                          <td className="border border-gray-300 px-4 py-3 text-center">
-                            {row.price4Pax ? `₹${row.price4Pax.toLocaleString('en-IN')}` : '-'}
+                          <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                            {row.price2Pax || '-'}
                           </td>
-                          <td className="border border-gray-300 px-4 py-3 text-center">
-                            {row.price6Pax ? `₹${row.price6Pax.toLocaleString('en-IN')}` : '-'}
+                          <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                            {row.price4Pax || '-'}
                           </td>
-                          <td className="border border-gray-300 px-4 py-3 text-center">
-                            {row.extraBed ? `₹${row.extraBed.toLocaleString('en-IN')}` : '-'}
+                          <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                            {row.price6Pax || '-'}
+                          </td>
+                          <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                            {row.extraBed || '-'}
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
+                
+                {pkg.additionalInfo && (
+                  <div className="mt-4 text-gray-700 leading-relaxed">
+                    {pkg.additionalInfo}
+                  </div>
+                )}
+                
                 {pkg.vehicleInfo && (
-                  <p className="text-sm text-gray-600 mt-4">
-                    <strong>Vehicle:</strong> {pkg.vehicleInfo}
+                  <p className="text-gray-700 mt-4">
+                    <strong>Vehicle Use:</strong> {pkg.vehicleInfo}
                   </p>
                 )}
               </div>
@@ -243,24 +266,28 @@ const PackageDetails = () => {
             {/* Hotel Details */}
             {pkg.hotelDetails && pkg.hotelDetails.length > 0 && (
               <div className="bg-white rounded-lg p-6 mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Hotel Details</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-6">Hotel Details</h2>
                 <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
+                  <table className="w-full" style={{ borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border border-gray-300 px-4 py-3 text-left font-semibold">Category</th>
-                        <th className="border border-gray-300 px-4 py-3 text-left font-semibold">Hotel Name</th>
+                      <tr style={{ backgroundColor: '#d1d5db' }}>
+                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900 w-1/4">
+                          Category
+                        </th>
+                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                          Manali
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {pkg.hotelDetails.map((hotel, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50">
-                          <td className="border border-gray-300 px-4 py-3 font-medium">{hotel.category}</td>
-                          <td className="border border-gray-300 px-4 py-3">
+                        <tr key={idx}>
+                          <td className="border border-gray-400 px-6 py-4 font-semibold text-gray-900">
+                            {hotel.category}
+                          </td>
+                          <td className="border border-gray-400 px-6 py-4 text-gray-900">
                             {hotel.hotelName}
-                            {hotel.roomType && (
-                              <span className="text-sm text-gray-600"> ({hotel.roomType})</span>
-                            )}
+                            {hotel.roomType && ` ( ${hotel.roomType} )`}
                           </td>
                         </tr>
                       ))}
@@ -272,38 +299,38 @@ const PackageDetails = () => {
 
             {/* Itinerary */}
             <div className="bg-white rounded-lg p-6 mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <Clock className="h-6 w-6 mr-2 text-orange-500" />
-                Day-wise Itinerary
-              </h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">Day Wise Itinerary</h2>
               <div className="space-y-6">
                 {itinerary.map((item) => (
-                  <div key={item.day} className="border-l-4 border-orange-500 pl-6 py-2">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <span className="bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold">
-                        Day {item.day}
-                      </span>
-                      <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
-                    </div>
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">{item.description}</p>
+                  <div key={item.day} className="py-2">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">
+                      Day {String(item.day).padStart(2, '0')}: {item.title}
+                    </h3>
+                    <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-line pl-4">
+                      {item.description}
+                    </p>
                   </div>
                 ))}
               </div>
+              {pkg.overview && pkg.overview.includes('Tour ends') && (
+                <div className="mt-6 pt-6 border-t">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Tour ends of your {pkg.title}
+                  </h3>
+                </div>
+              )}
             </div>
 
             {/* Inclusions & Exclusions */}
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="grid md:grid-cols-1 gap-6 mb-6">
               {/* Inclusions */}
               <div className="bg-white rounded-lg p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center text-green-600">
-                  <Check className="h-6 w-6 mr-2" />
-                  Package Includes
-                </h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-6">PACKAGE COST INCLUDES :</h2>
                 <ul className="space-y-3">
                   {inclusions.map((item, idx) => (
-                    <li key={idx} className="flex items-start space-x-3 text-gray-700">
-                      <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                      <span className="leading-relaxed">{item}</span>
+                    <li key={idx} className="flex items-start space-x-3 text-gray-900">
+                      <span className="text-2xl leading-none mt-[-2px]">•</span>
+                      <span className="text-lg leading-relaxed">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -311,15 +338,12 @@ const PackageDetails = () => {
 
               {/* Exclusions */}
               <div className="bg-white rounded-lg p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center text-red-600">
-                  <span className="text-2xl mr-2">✕</span>
-                  Package Does Not Include
-                </h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-6">Package Cost does not Includes</h2>
                 <ul className="space-y-3">
                   {exclusions.map((item, idx) => (
-                    <li key={idx} className="flex items-start space-x-3 text-gray-700">
-                      <span className="text-red-600 flex-shrink-0 mt-0.5 text-lg">✕</span>
-                      <span className="leading-relaxed">{item}</span>
+                    <li key={idx} className="flex items-start space-x-3 text-gray-900">
+                      <span className="text-2xl leading-none mt-[-2px]">•</span>
+                      <span className="text-lg leading-relaxed">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -329,12 +353,12 @@ const PackageDetails = () => {
             {/* Terms & Conditions */}
             {pkg.termsConditions && pkg.termsConditions.length > 0 && (
               <div className="bg-white rounded-lg p-6 mb-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Terms & Conditions</h2>
-                <ul className="space-y-2 text-gray-700">
+                <h2 className="text-3xl font-bold text-gray-900 mb-6">Terms & Conditions</h2>
+                <ul className="space-y-3">
                   {pkg.termsConditions.map((term, idx) => (
-                    <li key={idx} className="flex items-start space-x-2">
-                      <span className="text-orange-500 mt-1">•</span>
-                      <span className="leading-relaxed">{term}</span>
+                    <li key={idx} className="flex items-start space-x-3 text-gray-900">
+                      <span className="text-2xl leading-none mt-[-2px]">•</span>
+                      <span className="text-lg leading-relaxed">{term}</span>
                     </li>
                   ))}
                 </ul>
