@@ -62,10 +62,9 @@ export const parsePricingTable = (text) => {
 };
 
 /**
- * Parse hotel details from text
- * Handles formats like:
- * "Standard | Hotel President ( Deluxe )"
- * "Deluxe: Hotel Park Paradise ( Luxury Room )"
+ * Parse hotel details from text - supports both single and multi-column formats
+ * Single column: "Standard | Hotel President ( Deluxe )"
+ * Multi-column: "Standard | Rio Grande ( Deluxe ) | Maya The Forest | Parijat Retreat | ..."
  */
 export const parseHotelDetails = (text) => {
   if (!text || !text.trim()) return [];
@@ -73,25 +72,68 @@ export const parseHotelDetails = (text) => {
   const lines = text.split('\n').filter(line => line.trim());
   const results = [];
   
+  // Try to detect header row to get column names (locations)
+  let headerColumns = null;
+  for (const line of lines) {
+    if (line.toLowerCase().includes('category') || 
+        (line.includes('|') && !line.match(/\(/))) {
+      // This might be a header row
+      const cols = line.split(/[\|\t]/).map(c => c.trim()).filter(Boolean);
+      if (cols.length > 2 && !cols.some(c => c.toLowerCase().includes('category'))) {
+        // Not a header, skip
+        continue;
+      }
+      if (cols[0].toLowerCase().includes('category')) {
+        headerColumns = cols.slice(1); // Store location names
+        continue; // Skip header row
+      }
+    }
+  }
+  
   for (const line of lines) {
     // Skip header lines
-    if (line.toLowerCase().includes('category') || 
-        line.toLowerCase().includes('hotel details') ||
-        line.toLowerCase().includes('manali') && line.includes('---')) {
+    if (line.toLowerCase().includes('category') && line.toLowerCase().includes('hotel')) {
       continue;
     }
     
-    // Extract category and hotel name
-    const parts = line.split(/[\|\t:]/).map(p => p.trim()).filter(Boolean);
+    if (line.includes('---') || line.length < 3) {
+      continue;
+    }
+    
+    // Extract category and hotel names
+    const parts = line.split(/[\|\t]/).map(p => p.trim()).filter(Boolean);
     
     if (parts.length >= 2) {
       const category = parts[0].replace(/[*\-•]/g, '').trim();
-      const hotelName = parts.slice(1).join(' - ').trim();
       
-      results.push({
-        category,
-        hotelName
-      });
+      // Multi-column format
+      if (parts.length > 2 || headerColumns) {
+        const locations = {};
+        const hotelCols = parts.slice(1);
+        
+        hotelCols.forEach((hotel, idx) => {
+          if (hotel && hotel.trim()) {
+            const locationName = headerColumns && headerColumns[idx] 
+              ? headerColumns[idx] 
+              : `Location ${idx + 1}`;
+            locations[locationName] = hotel.trim();
+          }
+        });
+        
+        if (Object.keys(locations).length > 0) {
+          results.push({
+            category,
+            locations
+          });
+        }
+      } else {
+        // Single column format (backward compatibility)
+        const hotelName = parts.slice(1).join(' - ').trim();
+        results.push({
+          category,
+          hotelName
+        });
+      }
     }
   }
   

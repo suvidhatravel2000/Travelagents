@@ -101,13 +101,44 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
   const addHotelRow = () => {
     setFormData({
       ...formData,
-      hotelDetails: [...formData.hotelDetails, { category: '', hotelName: '', roomType: '' }]
+      hotelDetails: [...formData.hotelDetails, { category: '', locations: {} }]
     });
   };
 
   const updateHotel = (index, field, value) => {
     const newHotels = [...formData.hotelDetails];
-    newHotels[index][field] = value;
+    if (field === 'category') {
+      newHotels[index].category = value;
+    } else if (field.startsWith('location_')) {
+      // Update specific location
+      const locationName = field.replace('location_', '');
+      if (!newHotels[index].locations) {
+        newHotels[index].locations = {};
+      }
+      newHotels[index].locations[locationName] = value;
+    } else {
+      newHotels[index][field] = value;
+    }
+    setFormData({ ...formData, hotelDetails: newHotels });
+  };
+
+  const addLocationColumn = (index) => {
+    const locationName = prompt('Enter location name (e.g., Nainital, Jim Corbett):');
+    if (locationName && locationName.trim()) {
+      const newHotels = [...formData.hotelDetails];
+      if (!newHotels[index].locations) {
+        newHotels[index].locations = {};
+      }
+      newHotels[index].locations[locationName.trim()] = '';
+      setFormData({ ...formData, hotelDetails: newHotels });
+    }
+  };
+
+  const removeLocationColumn = (hotelIndex, locationName) => {
+    const newHotels = [...formData.hotelDetails];
+    if (newHotels[hotelIndex].locations) {
+      delete newHotels[hotelIndex].locations[locationName];
+    }
     setFormData({ ...formData, hotelDetails: newHotels });
   };
 
@@ -660,15 +691,17 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
                       📋 Paste Hotel Details (from suvidhatravel.com)
                     </label>
                     <p className="text-xs text-blue-700 mb-2">
-                      Paste hotel information here. Each line should contain category and hotel name.
+                      Paste hotel information here. Supports both single and multi-column formats.
                       <br />
-                      <strong>Example:</strong> Standard | Hotel President ( Deluxe )
+                      <strong>Single column:</strong> Standard | Hotel President ( Deluxe )
+                      <br />
+                      <strong>Multi-column:</strong> Standard | Hotel A | Hotel B | Hotel C
                     </p>
                     <textarea
                       rows={8}
                       value={pasteText.hotelDetails || ''}
                       onChange={(e) => setPasteText({ ...pasteText, hotelDetails: e.target.value })}
-                      placeholder="Standard | Hotel President ( Deluxe )&#10;Deluxe | Hotel Park Paradise ( Luxury Room with Balcony )"
+                      placeholder="Category | Nainital | Jim Corbett | Ranikhet&#10;Standard | Rio Grande (Deluxe) | Maya The Forest | Parijat Retreat&#10;Deluxe | Cedarwood Resort | Aroma Heaven | Xomotel Heights"
                       className="w-full px-3 py-2 border border-blue-300 rounded font-mono text-sm"
                     />
                   </div>
@@ -692,22 +725,71 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  
+                  {/* Category Input */}
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">Category</label>
                     <input
                       type="text"
-                      placeholder="Category"
+                      placeholder="Category (e.g., Standard, Deluxe)"
                       value={hotel.category}
                       onChange={(e) => updateHotel(idx, 'category', e.target.value)}
-                      className="px-3 py-2 border rounded text-sm"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Hotel Name with (Room Type)"
-                      value={hotel.hotelName}
-                      onChange={(e) => updateHotel(idx, 'hotelName', e.target.value)}
-                      className="px-3 py-2 border rounded text-sm"
+                      className="w-full px-3 py-2 border rounded text-sm"
                     />
                   </div>
+
+                  {/* Location Columns (Dynamic) */}
+                  {hotel.locations && Object.keys(hotel.locations).length > 0 && (
+                    <div className="space-y-2">
+                      <label className="text-xs text-gray-600">Locations & Hotels</label>
+                      {Object.entries(hotel.locations).map(([locationName, hotelName]) => (
+                        <div key={locationName} className="flex items-center space-x-2">
+                          <span className="text-xs font-semibold text-gray-700 w-32 flex-shrink-0">
+                            {locationName}:
+                          </span>
+                          <input
+                            type="text"
+                            placeholder="Hotel name"
+                            value={hotelName}
+                            onChange={(e) => updateHotel(idx, `location_${locationName}`, e.target.value)}
+                            className="flex-1 px-3 py-2 border rounded text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeLocationColumn(idx, locationName)}
+                            className="text-red-500 hover:text-red-700"
+                            title="Remove this location"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Single Hotel Name (Backward Compatibility) */}
+                  {hotel.hotelName && !hotel.locations && (
+                    <div>
+                      <label className="text-xs text-gray-600 mb-1 block">Hotel Name</label>
+                      <input
+                        type="text"
+                        placeholder="Hotel Name with (Room Type)"
+                        value={hotel.hotelName}
+                        onChange={(e) => updateHotel(idx, 'hotelName', e.target.value)}
+                        className="w-full px-3 py-2 border rounded text-sm"
+                      />
+                    </div>
+                  )}
+
+                  {/* Add Location Button */}
+                  <button
+                    type="button"
+                    onClick={() => addLocationColumn(idx)}
+                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+                  >
+                    <Plus className="h-3 w-3" />
+                    <span>Add Location Column</span>
+                  </button>
                 </div>
               ))}
 

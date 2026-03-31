@@ -18,8 +18,10 @@ class PricingCategory(BaseModel):
 
 class HotelDetail(BaseModel):
     category: str
-    hotelName: str
-    roomType: Optional[str] = None
+    # Dynamic columns for multiple locations (Nainital, Jim Corbett, etc.)
+    # Can be either simple hotelName or dict of location: hotel
+    hotelName: Optional[str] = None  # For backward compatibility (single column)
+    locations: Optional[dict] = None  # For multi-column: {"Nainital": "Hotel Name", "Jim Corbett": "..."}
 
 class PackageBase(BaseModel):
     title: str
