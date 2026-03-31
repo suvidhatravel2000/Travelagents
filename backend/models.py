@@ -9,6 +9,18 @@ class ItineraryItem(BaseModel):
     title: str
     description: str
 
+class PricingCategory(BaseModel):
+    category: str  # Standard, Deluxe, Premium, etc.
+    price2Pax: Optional[int] = None
+    price4Pax: Optional[int] = None
+    price6Pax: Optional[int] = None
+    extraBed: Optional[int] = None
+
+class HotelDetail(BaseModel):
+    category: str
+    hotelName: str
+    roomType: Optional[str] = None
+
 class PackageBase(BaseModel):
     title: str
     destination: str
@@ -17,15 +29,25 @@ class PackageBase(BaseModel):
     rating: Optional[float] = None
     duration: str
     days: str
-    price: int
+    price: int  # Base price for display
     originalPrice: int
     savings: int
     flightsIncluded: bool = False
     groupTour: bool = False
+    
+    # Enhanced fields
+    overview: Optional[str] = ""
     itinerary: Optional[List[ItineraryItem]] = []
     inclusions: Optional[List[str]] = []
     exclusions: Optional[List[str]] = []
-    overview: Optional[str] = ""
+    
+    # New fields for detailed packages
+    pricingTable: Optional[List[PricingCategory]] = []
+    hotelDetails: Optional[List[HotelDetail]] = []
+    vehicleInfo: Optional[str] = ""
+    validityDates: Optional[str] = ""
+    additionalInfo: Optional[str] = ""
+    termsConditions: Optional[List[str]] = []
 
 class PackageCreate(PackageBase):
     pass
