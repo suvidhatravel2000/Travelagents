@@ -274,9 +274,18 @@ const PackageDetails = () => {
                         <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900 w-1/4">
                           Category
                         </th>
-                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
-                          Manali
-                        </th>
+                        {/* Dynamic location columns */}
+                        {pkg.hotelDetails[0]?.locations && Object.keys(pkg.hotelDetails[0].locations).map((location) => (
+                          <th key={location} className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                            {location}
+                          </th>
+                        ))}
+                        {/* Fallback to single column if no locations */}
+                        {!pkg.hotelDetails[0]?.locations && (
+                          <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                            Hotel
+                          </th>
+                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -285,10 +294,18 @@ const PackageDetails = () => {
                           <td className="border border-gray-400 px-6 py-4 font-semibold text-gray-900">
                             {hotel.category}
                           </td>
-                          <td className="border border-gray-400 px-6 py-4 text-gray-900">
-                            {hotel.hotelName}
-                            {hotel.roomType && ` ( ${hotel.roomType} )`}
-                          </td>
+                          {/* Multi-column format */}
+                          {hotel.locations && Object.values(hotel.locations).map((hotelName, locIdx) => (
+                            <td key={locIdx} className="border border-gray-400 px-6 py-4 text-gray-900">
+                              {hotelName}
+                            </td>
+                          ))}
+                          {/* Single column format (backward compatible) */}
+                          {!hotel.locations && (
+                            <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                              {hotel.hotelName}
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
@@ -326,7 +343,7 @@ const PackageDetails = () => {
               {/* Inclusions */}
               <div className="bg-white rounded-lg p-6">
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">PACKAGE COST INCLUDES :</h2>
-                <ul className="space-y-3">
+                <ul className="space-y-1.5">
                   {inclusions.map((item, idx) => (
                     <li key={idx} className="flex items-start space-x-3 text-gray-900">
                       <span className="text-2xl leading-none mt-[-2px]">•</span>
@@ -339,7 +356,7 @@ const PackageDetails = () => {
               {/* Exclusions */}
               <div className="bg-white rounded-lg p-6">
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">Package Cost does not Includes</h2>
-                <ul className="space-y-3">
+                <ul className="space-y-1.5">
                   {exclusions.map((item, idx) => (
                     <li key={idx} className="flex items-start space-x-3 text-gray-900">
                       <span className="text-2xl leading-none mt-[-2px]">•</span>
@@ -354,7 +371,7 @@ const PackageDetails = () => {
             {pkg.termsConditions && pkg.termsConditions.length > 0 && (
               <div className="bg-white rounded-lg p-6 mb-6">
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">Terms & Conditions</h2>
-                <ul className="space-y-3">
+                <ul className="space-y-1.5">
                   {pkg.termsConditions.map((term, idx) => (
                     <li key={idx} className="flex items-start space-x-3 text-gray-900">
                       <span className="text-2xl leading-none mt-[-2px]">•</span>
