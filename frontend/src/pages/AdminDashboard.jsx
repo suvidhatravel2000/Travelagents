@@ -9,12 +9,11 @@ import {
   Plus,
   Edit,
   Trash2,
-  Search,
-  X,
-  Save
+  Search
 } from 'lucide-react';
 import { packagesAPI, destinationsAPI, settingsAPI, authAPI } from '../api/client';
 import { useToast } from '../hooks/use-toast';
+import EnhancedPackageModal from '../components/admin/EnhancedPackageModal';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -268,7 +267,7 @@ const AdminDashboard = () => {
 
       {/* Add/Edit Package Modal */}
       {showAddModal && (
-        <PackageModal
+        <EnhancedPackageModal
           package={editingPackage}
           destinations={destinations}
           onSave={handleSavePackage}
@@ -478,222 +477,6 @@ const SettingsTab = ({ settings, onUpdate }) => {
           Save Changes
         </button>
       </form>
-    </div>
-  );
-};
-
-// Package Modal Component
-const PackageModal = ({ package: pkg, destinations, onSave, onClose }) => {
-  const [formData, setFormData] = useState(pkg || {
-    title: '',
-    destination: '',
-    category: '',
-    image: '',
-    rating: 0,
-    duration: '',
-    days: '',
-    price: 0,
-    originalPrice: 0,
-    savings: 0,
-    flightsIncluded: false,
-    groupTour: false,
-    overview: '',
-    itinerary: [],
-    inclusions: [],
-    exclusions: []
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Calculate savings
-    const savings = formData.originalPrice - formData.price;
-    onSave({ ...formData, savings });
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {pkg ? 'Edit Package' : 'Add New Package'}
-            </h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
-              <input
-                type="text"
-                required
-                value={formData.title}
-                onChange={(e) => setFormData({...formData, title: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Destination ID *</label>
-                <select
-                  required
-                  value={formData.destination}
-                  onChange={(e) => {
-                    const dest = destinations.find(d => d.id === e.target.value);
-                    setFormData({
-                      ...formData,
-                      destination: e.target.value,
-                      category: dest?.name || ''
-                    });
-                  }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Select Destination</option>
-                  {destinations.map(dest => (
-                    <option key={dest.id} value={dest.id}>{dest.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                <input
-                  type="text"
-                  value={formData.category}
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Image URL *</label>
-              <input
-                type="url"
-                required
-                placeholder="https://images.unsplash.com/..."
-                value={formData.image}
-                onChange={(e) => setFormData({...formData, image: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-              <p className="text-xs text-gray-500 mt-1">Use Unsplash or other image hosting services</p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Duration</label>
-                <input
-                  type="text"
-                  placeholder="4N/5D"
-                  value={formData.duration}
-                  onChange={(e) => setFormData({...formData, duration: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Days</label>
-                <input
-                  type="text"
-                  placeholder="2D Pattaya • 3D Bangkok"
-                  value={formData.days}
-                  onChange={(e) => setFormData({...formData, days: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="5"
-                  value={formData.rating}
-                  onChange={(e) => setFormData({...formData, rating: parseFloat(e.target.value)})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Price *</label>
-                <input
-                  type="number"
-                  required
-                  value={formData.price}
-                  onChange={(e) => setFormData({...formData, price: parseInt(e.target.value)})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Original Price *</label>
-                <input
-                  type="number"
-                  required
-                  value={formData.originalPrice}
-                  onChange={(e) => setFormData({...formData, originalPrice: parseInt(e.target.value)})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-6">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.flightsIncluded}
-                  onChange={(e) => setFormData({...formData, flightsIncluded: e.target.checked})}
-                  className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
-                />
-                <span className="ml-2 text-sm text-gray-700">Flights Included</span>
-              </label>
-
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.groupTour}
-                  onChange={(e) => setFormData({...formData, groupTour: e.target.checked})}
-                  className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
-                />
-                <span className="ml-2 text-sm text-gray-700">Group Tour</span>
-              </label>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Overview</label>
-              <textarea
-                rows={3}
-                value={formData.overview}
-                onChange={(e) => setFormData({...formData, overview: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-
-            <div className="flex justify-end space-x-4 pt-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors"
-              >
-                <Save className="h-5 w-5" />
-                <span>Save Package</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
   );
 };
