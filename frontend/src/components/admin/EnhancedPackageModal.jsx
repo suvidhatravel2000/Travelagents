@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, Save, Plus, Trash2, FileText, Sparkles, Zap } from 'lucide-react';
+import { X, Save, Plus, Trash2, FileText, Sparkles, Zap, Image as ImageIcon } from 'lucide-react';
 import { smartParse } from '../../utils/packageParser';
 import { parseBulkPackageData, generatePreview } from '../../utils/bulkPackageParser';
+import MediaGallery from './MediaGallery';
 
 const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) => {
   const [activeTab, setActiveTab] = useState('bulk');
@@ -9,6 +10,7 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
   const [pasteText, setPasteText] = useState({}); // Store paste text for each section
   const [bulkText, setBulkText] = useState(''); // Store full page text for bulk import
   const [bulkPreview, setBulkPreview] = useState(''); // Preview of parsed data
+  const [showMediaGallery, setShowMediaGallery] = useState(false); // Media gallery modal
   const [formData, setFormData] = useState(pkg || {
     title: '',
     destination: '',
@@ -1151,6 +1153,19 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
 
           {/* Footer Buttons */}
           <div className="flex justify-end space-x-4 pt-6 border-t mt-6">
+
+
+      {/* Media Gallery Modal */}
+      {showMediaGallery && (
+        <MediaGallery
+          onSelectImage={(url) => {
+            setFormData({ ...formData, image: url });
+            setShowMediaGallery(false);
+          }}
+          onClose={() => setShowMediaGallery(false)}
+        />
+      )}
+
             <button
               type="button"
               onClick={onClose}

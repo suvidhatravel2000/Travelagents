@@ -12,7 +12,9 @@ async def get_db():
 @router.get("/", response_model=List[Destination])
 async def get_destinations(db: AsyncIOMotorDatabase = Depends(get_db)):
     """Get all destinations"""
-    destinations = await db.destinations.find().to_list(1000)
+    destinations = await db.destinations.find({}, {"_id": 0}).to_list(1000)
+    # Sort by order
+    destinations.sort(key=lambda x: x.get('order', 0))
     return destinations
 
 @router.get("/{destination_id}", response_model=Destination)
@@ -21,7 +23,7 @@ async def get_destination(
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get a single destination"""
-    destination = await db.destinations.find_one({"id": destination_id})
+    destination = await db.destinations.find_one({"id": destination_id}, {"_id": 0})
     if not destination:
         raise HTTPException(status_code=404, detail="Destination not found")
     return destination
@@ -45,7 +47,7 @@ async def update_destination(
     """Update a destination"""
     from datetime import datetime
     
-    existing = await db.destinations.find_one({"id": destination_id})
+    existing = await db.destinations.find_one({"id": destination_id}, {"_id": 0})
     if not existing:
         raise HTTPException(status_code=404, detail="Destination not found")
     
@@ -57,7 +59,7 @@ async def update_destination(
         {"$set": update_data}
     )
     
-    updated = await db.destinations.find_one({"id": destination_id})
+    updated = await db.destinations.find_one({"id": destination_id}, {"_id": 0})
     return updated
 
 @router.delete("/{destination_id}")

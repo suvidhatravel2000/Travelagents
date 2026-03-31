@@ -25,11 +25,13 @@ import FooterEditor from '../components/admin/FooterEditor';
 import SectionVisibilityControl from '../components/admin/SectionVisibilityControl';
 import DestinationsEditor from '../components/admin/DestinationsEditor';
 import TrendingPackagesEditor from '../components/admin/TrendingPackagesEditor';
+import MediaGallery from '../components/admin/MediaGallery';
 
 const AdminDashboardCMS = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
+  const [showMediaGallery, setShowMediaGallery] = useState(false);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     packages: 0,
@@ -181,6 +183,16 @@ const AdminDashboardCMS = () => {
             <Eye className="h-5 w-5" />
             <span>Section Visibility</span>
           </button>
+
+          {/* Media Gallery Button */}
+          <button
+            onClick={() => setShowMediaGallery(true)}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors hover:bg-gray-800 border border-gray-700 mt-2"
+          >
+            <ImageIcon className="h-5 w-5" />
+            <span>📸 Media Gallery</span>
+          </button>
+
           
           <button
             onClick={() => setActiveTab('settings')}
@@ -282,6 +294,19 @@ const AdminDashboardCMS = () => {
         {activeTab === 'destinations' && <DestinationsEditor />}
         {activeTab === 'trending' && <TrendingPackagesEditor />}
         {activeTab === 'footer' && <FooterEditor />}
+
+      {/* Media Gallery Modal */}
+      {showMediaGallery && (
+        <MediaGallery
+          onSelectImage={(url) => {
+            navigator.clipboard.writeText(url);
+            alert('✅ Image URL copied to clipboard!');
+            setShowMediaGallery(false);
+          }}
+          onClose={() => setShowMediaGallery(false)}
+        />
+      )}
+
         {activeTab === 'visibility' && <SectionVisibilityControl />}
         
         {/* Settings Tab */}
