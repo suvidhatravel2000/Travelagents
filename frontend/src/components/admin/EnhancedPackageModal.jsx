@@ -1265,7 +1265,7 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
       {/* Media Gallery Modal */}
       {showMediaGallery && (
         <MediaGallery
-          onSelectImage={(url) => {
+          onSelect={(url) => {
             setFormData({ ...formData, image: url });
             setShowMediaGallery(false);
           }}

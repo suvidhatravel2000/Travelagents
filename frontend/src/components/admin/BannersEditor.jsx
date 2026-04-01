@@ -135,7 +135,7 @@ const SortableBanner = ({ banner, onUpdate, onDelete }) => {
           {/* Media Gallery Modal */}
           {showMediaGallery && (
             <MediaGallery
-              onSelectImage={(imageUrl) => {
+              onSelect={(imageUrl) => {
                 if (mediaTarget === 'desktop') {
                   onUpdate(banner.id, 'imageDesktop', imageUrl);
                 } else {

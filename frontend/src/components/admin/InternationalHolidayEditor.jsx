@@ -16,6 +16,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { holidayPagesAPI, packagesAPI } from '../../api/client';
+import MediaGallery from './MediaGallery';
 
 const SortableTab = ({ tab, onUpdate, onDelete }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: tab.id });
@@ -71,6 +72,8 @@ const InternationalHolidayEditor = () => {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const [mediaTarget, setMediaTarget] = useState(null);
   const [expandedSections, setExpandedSections] = useState({
     banner: true,
     tabs: true,
@@ -255,26 +258,61 @@ const InternationalHolidayEditor = () => {
             <div className="p-4 border-t space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Desktop Banner Image URL</label>
+                  <label className="block text-sm font-medium mb-2 flex items-center justify-between">
+                    <span>Desktop Banner Image URL</span>
+                    <button
+                      type="button"
+                      onClick={() => { setMediaTarget('desktopImage'); setShowMediaGallery(true); }}
+                      className="text-blue-600 hover:text-blue-800 flex items-center space-x-1 text-xs"
+                      data-testid="intl-banner-desktop-gallery-btn"
+                    >
+                      <ImageIcon className="h-4 w-4" />
+                      <span>Browse Gallery</span>
+                    </button>
+                  </label>
                   <input
                     type="url"
                     value={config.banner.desktopImage}
                     onChange={(e) => updateBanner('desktopImage', e.target.value)}
                     className="w-full px-3 py-2 border rounded"
                     placeholder="https://..."
+                    data-testid="intl-banner-desktop-input"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Mobile Banner Image URL</label>
+                  <label className="block text-sm font-medium mb-2 flex items-center justify-between">
+                    <span>Mobile Banner Image URL</span>
+                    <button
+                      type="button"
+                      onClick={() => { setMediaTarget('mobileImage'); setShowMediaGallery(true); }}
+                      className="text-blue-600 hover:text-blue-800 flex items-center space-x-1 text-xs"
+                      data-testid="intl-banner-mobile-gallery-btn"
+                    >
+                      <ImageIcon className="h-4 w-4" />
+                      <span>Browse Gallery</span>
+                    </button>
+                  </label>
                   <input
                     type="url"
                     value={config.banner.mobileImage || ''}
                     onChange={(e) => updateBanner('mobileImage', e.target.value)}
                     className="w-full px-3 py-2 border rounded"
                     placeholder="https://..."
+                    data-testid="intl-banner-mobile-input"
                   />
                 </div>
               </div>
+
+              {/* Media Gallery Modal */}
+              {showMediaGallery && (
+                <MediaGallery
+                  onSelect={(url) => {
+                    updateBanner(mediaTarget, url);
+                    setShowMediaGallery(false);
+                  }}
+                  onClose={() => setShowMediaGallery(false)}
+                />
+              )}
 
               <div>
                 <label className="block text-sm font-medium mb-2">Banner Title</label>

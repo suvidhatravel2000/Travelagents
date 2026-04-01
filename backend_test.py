@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Base URL from frontend .env
-BASE_URL = "https://booking-dashboard-49.preview.emergentagent.com/api"
+BASE_URL = "https://suvidha-dashboard.preview.emergentagent.com/api"
 
 # Test credentials
 ADMIN_USERNAME = "admin"
