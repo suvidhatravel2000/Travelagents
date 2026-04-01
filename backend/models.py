@@ -11,10 +11,18 @@ class ItineraryItem(BaseModel):
 
 class PricingCategory(BaseModel):
     category: str  # Standard, Deluxe, Premium, etc.
+    
+    # NEW: Dynamic columns format (unlimited columns)
+    columns: Optional[dict] = None  # {"2 Pax": "15000", "4 Pax": "12000", ...}
+    
+    # OLD: Fixed columns format (backward compatibility)
     price2Pax: Optional[int] = None
     price4Pax: Optional[int] = None
     price6Pax: Optional[int] = None
     extraBed: Optional[int] = None
+    
+    class Config:
+        extra = "allow"  # Allow additional fields not explicitly defined
 
 class HotelDetail(BaseModel):
     category: str
