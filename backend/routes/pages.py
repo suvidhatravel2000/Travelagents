@@ -90,13 +90,16 @@ async def update_page_config(
         return updated
     else:
         # Create new
-        new_config = HolidayPageConfig(
-            **config_update.dict(),
-            pageType=page_type
-        )
+        config_data = config_update.dict()
+        config_data["pageType"] = page_type
+        config_data["id"] = str(uuid.uuid4())
+        config_data["createdAt"] = datetime.utcnow()
+        config_data["updatedAt"] = datetime.utcnow()
         
-        await db.holiday_pages.insert_one(new_config.dict())
-        return new_config
+        await db.holiday_pages.insert_one(config_data)
+        
+        created = await db.holiday_pages.find_one({"pageType": page_type}, {"_id": 0})
+        return created
 
 @router.get("/", response_model=list)
 async def get_all_page_configs(
