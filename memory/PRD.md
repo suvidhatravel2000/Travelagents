@@ -24,7 +24,7 @@ Build a pixel-perfect clone of `https://www.viacation.com/` with an Admin Dashbo
 - Homepage with hero banners, destination tabs, trending packages
 - India Holidays page (dynamic, CMS-controlled, SEO meta tags)
 - International Holidays page (dynamic, CMS-controlled, SEO meta tags)
-- Package Details page (SEO meta tags, properly aligned Download button and tables)
+- Package Details page (standardized fonts, no download button, SEO meta tags)
 - Blog listing page (API-driven, featured posts, category filter, search)
 - Blog detail page (`/blog/:slug`, markdown rendering, SEO meta tags)
 - Admin Login & Dashboard
@@ -39,17 +39,17 @@ Build a pixel-perfect clone of `https://www.viacation.com/` with an Admin Dashbo
 
 ### UI Fixes Applied
 - Removed "Made with Emergent" badge from all pages
-- Download Details button properly aligned inside main content area
-- Pricing and Hotel tables properly aligned with reduced padding (no cut-off)
+- Removed Download Details button/feature from Package Details page
+- Standardized font sizes across Package Details (h2: text-xl, body: text-sm, sidebar: text-sm)
+- Pricing and Hotel tables properly aligned with compact padding
 
 ## Completed Tasks (Latest First)
-- [Feb 2026] UI fixes: Badge removal, Download button alignment, table padding
+- [Feb 2026] Removed Download Details, standardized font sizes on Package Details page
+- [Feb 2026] UI fixes: Badge removal, table padding
 - [Feb 2026] Full Blog CMS with rich text editor, categories, tags, SEO
 - [Feb 2026] Made Banner fields editable: Description, Price, Duration, Features
 - [Feb 2026] SEO fields + live score widget for Packages, Holidays, Blog
 - [Feb 2026] Integrated Media Gallery "Select" into all editors
-- [Feb 2026] Fixed Media Gallery image loading, built simplified gallery
-- [Feb 2026] Dynamic admin control for Header Dropdowns
 
 ## Backlog
 - **P1**: Refactor `EnhancedPackageModal.jsx` (>1300 lines) into smaller sub-components

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -10,25 +10,21 @@ import {
   Phone, 
   Mail, 
   Clock, 
-  Check,
-  Download
+  Check
 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { packagesAPI, settingsAPI } from '../api/client';
 import { Helmet } from 'react-helmet-async';
-import html2pdf from 'html2pdf.js';
 
 const PackageDetails = () => {
   const { packageId } = useParams();
   const navigate = useNavigate();
-  const downloadRef = useRef(null);
   
   const [pkg, setPkg] = useState(null);
   const [companyInfo, setCompanyInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,46 +47,6 @@ const PackageDetails = () => {
 
     fetchData();
   }, [packageId]);
-
-  // Download PDF function
-  const handleDownloadPDF = () => {
-    if (!downloadRef.current || !pkg) return;
-    
-    setIsDownloading(true);
-    
-    const opt = {
-      margin: [10, 10, 10, 10],
-      filename: `${pkg.title.replace(/[^a-z0-9]/gi, '_')}_Details.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        letterRendering: true,
-        width: downloadRef.current.scrollWidth,  // Capture full width including overflow
-        windowWidth: downloadRef.current.scrollWidth
-      },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'landscape'  // Changed to landscape for wider tables
-      },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    };
-
-    html2pdf()
-      .set(opt)
-      .from(downloadRef.current)
-      .save()
-      .then(() => {
-        setIsDownloading(false);
-      })
-      .catch((error) => {
-        console.error('PDF generation error:', error);
-        setIsDownloading(false);
-        alert('Failed to generate PDF. Please try again.');
-      });
-  };
 
   if (loading) {
     return (
@@ -173,37 +129,7 @@ const PackageDetails = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 min-w-0" ref={downloadRef}>
-            {/* PDF-specific styles */}
-            <style jsx="true">{`
-              @media print {
-                * {
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                }
-                table {
-                  page-break-inside: avoid;
-                  border-collapse: collapse !important;
-                  width: 100% !important;
-                  font-size: 10px !important;
-                }
-                th, td {
-                  padding: 4px 6px !important;
-                  font-size: 9px !important;
-                  white-space: nowrap !important;
-                }
-                tr {
-                  page-break-inside: avoid;
-                  page-break-after: auto;
-                }
-                thead {
-                  display: table-header-group;
-                }
-                .overflow-x-auto {
-                  overflow: visible !important;
-                }
-              }
-            `}</style>
+          <div className="lg:col-span-2 min-w-0">
             {/* Hero Image */}
             <div className="relative rounded-2xl overflow-hidden mb-6">
               <img
@@ -213,8 +139,8 @@ const PackageDetails = () => {
               />
               {pkg.rating && (
                 <div className="absolute top-4 right-4 bg-green-600 text-white px-3 py-2 rounded-lg flex items-center space-x-1 text-sm font-medium">
-                  <Star className="h-5 w-5 fill-white" />
-                  <span className="text-lg">{pkg.rating}</span>
+                  <Star className="h-4 w-4 fill-white" />
+                  <span>{pkg.rating}</span>
                 </div>
               )}
               
@@ -237,19 +163,19 @@ const PackageDetails = () => {
 
             {/* Package Title and Info */}
             <div className="bg-white rounded-lg p-6 mb-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1 min-w-0">
-                  <span className="inline-block bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium mb-3">
+              <div className="mb-4">
+                <div>
+                  <span className="inline-block bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-xs font-medium mb-3">
                     {pkg.category}
                   </span>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{pkg.title}</h1>
-                  <div className="flex items-center space-x-4 text-gray-600">
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-5 w-5" />
+                  <h1 className="text-2xl font-bold text-gray-900 mb-2">{pkg.title}</h1>
+                  <div className="flex items-center space-x-4 text-gray-600 text-sm">
+                    <div className="flex items-center space-x-1.5">
+                      <Calendar className="h-4 w-4" />
                       <span>{pkg.duration}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="h-5 w-5" />
+                    <div className="flex items-center space-x-1.5">
+                      <MapPin className="h-4 w-4" />
                       <span>{pkg.days}</span>
                     </div>
                   </div>
@@ -259,15 +185,6 @@ const PackageDetails = () => {
                     </p>
                   )}
                 </div>
-                <button
-                  onClick={handleDownloadPDF}
-                  disabled={isDownloading}
-                  className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 self-start"
-                  data-testid="download-details-btn"
-                >
-                  <Download className="h-4 w-4" />
-                  <span className="text-sm">{isDownloading ? 'Generating...' : 'Download Details'}</span>
-                </button>
               </div>
             </div>
             {pkg.pricingTable && pkg.pricingTable.length > 0 && (() => {
@@ -407,7 +324,7 @@ const PackageDetails = () => {
             {/* Hotel Details */}
             {pkg.hotelDetails && pkg.hotelDetails.length > 0 && (
               <div className="bg-white rounded-lg p-6 mb-6">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">Hotel Details</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-6">Hotel Details</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full" style={{ borderCollapse: 'collapse', tableLayout: 'auto' }}>
                     <thead>
@@ -457,22 +374,22 @@ const PackageDetails = () => {
 
             {/* Itinerary */}
             <div className="bg-white rounded-lg p-6 mb-6">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Day Wise Itinerary</h2>
-              <div className="space-y-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Day Wise Itinerary</h2>
+              <div className="space-y-4">
                 {itinerary.map((item) => (
-                  <div key={item.day} className="py-2">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">
+                  <div key={item.day} className="py-1">
+                    <h3 className="text-base font-bold text-gray-900 mb-2">
                       Day {String(item.day).padStart(2, '0')}: {item.title}
                     </h3>
-                    <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-line pl-4">
+                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line pl-4">
                       {item.description}
                     </p>
                   </div>
                 ))}
               </div>
               {pkg.overview && pkg.overview.includes('Tour ends') && (
-                <div className="mt-6 pt-6 border-t">
-                  <h3 className="text-xl font-semibold text-gray-900">
+                <div className="mt-4 pt-4 border-t">
+                  <h3 className="text-base font-semibold text-gray-900">
                     Tour ends of your {pkg.title}
                   </h3>
                 </div>
@@ -483,12 +400,12 @@ const PackageDetails = () => {
             <div className="grid md:grid-cols-1 gap-6 mb-6">
               {/* Inclusions */}
               <div className="bg-white rounded-lg p-6">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">PACKAGE COST INCLUDES :</h2>
-                <ul className="space-y-1.5">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">PACKAGE COST INCLUDES :</h2>
+                <ul className="space-y-1">
                   {inclusions.map((item, idx) => (
-                    <li key={idx} className="flex items-start space-x-3 text-gray-900">
-                      <span className="text-2xl leading-none mt-[-2px]">•</span>
-                      <span className="text-lg leading-relaxed">{item}</span>
+                    <li key={idx} className="flex items-start space-x-2 text-gray-900">
+                      <span className="text-base leading-none mt-0.5">•</span>
+                      <span className="text-sm leading-relaxed">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -496,12 +413,12 @@ const PackageDetails = () => {
 
               {/* Exclusions */}
               <div className="bg-white rounded-lg p-6">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">Package Cost does not Includes</h2>
-                <ul className="space-y-1.5">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Package Cost does not Includes</h2>
+                <ul className="space-y-1">
                   {exclusions.map((item, idx) => (
-                    <li key={idx} className="flex items-start space-x-3 text-gray-900">
-                      <span className="text-2xl leading-none mt-[-2px]">•</span>
-                      <span className="text-lg leading-relaxed">{item}</span>
+                    <li key={idx} className="flex items-start space-x-2 text-gray-900">
+                      <span className="text-base leading-none mt-0.5">•</span>
+                      <span className="text-sm leading-relaxed">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -511,12 +428,12 @@ const PackageDetails = () => {
             {/* Terms & Conditions */}
             {pkg.termsConditions && pkg.termsConditions.length > 0 && (
               <div className="bg-white rounded-lg p-6 mb-6">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">Terms & Conditions</h2>
-                <ul className="space-y-1.5">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Terms & Conditions</h2>
+                <ul className="space-y-1">
                   {pkg.termsConditions.map((term, idx) => (
-                    <li key={idx} className="flex items-start space-x-3 text-gray-900">
-                      <span className="text-2xl leading-none mt-[-2px]">•</span>
-                      <span className="text-lg leading-relaxed">{term}</span>
+                    <li key={idx} className="flex items-start space-x-2 text-gray-900">
+                      <span className="text-base leading-none mt-0.5">•</span>
+                      <span className="text-sm leading-relaxed">{term}</span>
                     </li>
                   ))}
                 </ul>
@@ -529,11 +446,11 @@ const PackageDetails = () => {
             <div className="bg-white rounded-lg p-6 shadow-lg sticky top-24">
               <div className="mb-6">
                 <p className="text-gray-600 text-sm mb-2">Starting from</p>
-                <div className="flex items-baseline space-x-3 mb-2">
-                  <span className="text-4xl font-bold text-orange-500">
+                <div className="flex items-baseline space-x-2 mb-2">
+                  <span className="text-3xl font-bold text-orange-500">
                     ₹{pkg.price.toLocaleString('en-IN')}
                   </span>
-                  <span className="text-xl text-gray-500 line-through">
+                  <span className="text-base text-gray-500 line-through">
                     ₹{pkg.originalPrice.toLocaleString('en-IN')}
                   </span>
                 </div>
@@ -546,17 +463,17 @@ const PackageDetails = () => {
               </div>
 
               <div className="space-y-3 mb-6">
-                <div className="flex items-center justify-between py-3 border-b">
-                  <span className="text-gray-600">Duration</span>
-                  <span className="font-semibold text-gray-900">{pkg.duration}</span>
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-gray-600 text-sm">Duration</span>
+                  <span className="font-semibold text-gray-900 text-sm">{pkg.duration}</span>
                 </div>
-                <div className="flex items-center justify-between py-3 border-b">
-                  <span className="text-gray-600">Category</span>
-                  <span className="font-semibold text-gray-900">{pkg.category}</span>
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-gray-600 text-sm">Category</span>
+                  <span className="font-semibold text-gray-900 text-sm">{pkg.category}</span>
                 </div>
                 {pkg.rating && (
-                  <div className="flex items-center justify-between py-3 border-b">
-                    <span className="text-gray-600">Rating</span>
+                  <div className="flex items-center justify-between py-2 border-b">
+                    <span className="text-gray-600 text-sm">Rating</span>
                     <div className="flex items-center space-x-1">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                       <span className="font-semibold text-gray-900">{pkg.rating}</span>
@@ -567,17 +484,17 @@ const PackageDetails = () => {
 
               <button
                 onClick={() => window.location.href = `tel:${companyInfo.phones[0]}`}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-lg font-semibold text-lg transition-colors mb-3 flex items-center justify-center space-x-2"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold text-base transition-colors mb-3 flex items-center justify-center space-x-2"
               >
-                <Phone className="h-5 w-5" />
+                <Phone className="h-4 w-4" />
                 <span>Call Now to Book</span>
               </button>
 
               <a
                 href={`mailto:${companyInfo.emails[0]}`}
-                className="w-full border-2 border-orange-500 text-orange-500 hover:bg-orange-50 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
+                className="w-full border-2 border-orange-500 text-orange-500 hover:bg-orange-50 py-2.5 rounded-lg font-semibold text-sm transition-colors flex items-center justify-center space-x-2"
               >
-                <Mail className="h-5 w-5" />
+                <Mail className="h-4 w-4" />
                 <span>Email Inquiry</span>
               </a>
 
