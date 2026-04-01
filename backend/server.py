@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -7,7 +8,7 @@ import logging
 from pathlib import Path
 
 # Import routes
-from routes import packages, destinations, banners, settings, auth
+from routes import packages, destinations, banners, settings, auth, media
 from routes import cms_topbar, cms_footer, cms_homepage
 
 ROOT_DIR = Path(__file__).parent
@@ -42,6 +43,7 @@ app.include_router(auth.router)
 app.include_router(cms_topbar.router)
 app.include_router(cms_footer.router)
 app.include_router(cms_homepage.router)
+app.include_router(media.router)
 app.include_router(api_router)
 
 app.add_middleware(
@@ -51,6 +53,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Serve uploaded files
+app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
 
 # Configure logging
 logging.basicConfig(
