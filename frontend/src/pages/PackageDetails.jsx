@@ -65,12 +65,14 @@ const PackageDetails = () => {
         scale: 2,
         useCORS: true,
         logging: false,
-        letterRendering: true
+        letterRendering: true,
+        width: downloadRef.current.scrollWidth,  // Capture full width including overflow
+        windowWidth: downloadRef.current.scrollWidth
       },
       jsPDF: { 
         unit: 'mm', 
         format: 'a4', 
-        orientation: 'portrait'
+        orientation: 'landscape'  // Changed to landscape for wider tables
       },
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
@@ -185,6 +187,13 @@ const PackageDetails = () => {
                 table {
                   page-break-inside: avoid;
                   border-collapse: collapse !important;
+                  width: 100% !important;
+                  font-size: 10px !important;
+                }
+                th, td {
+                  padding: 4px 6px !important;
+                  font-size: 9px !important;
+                  white-space: nowrap !important;
                 }
                 tr {
                   page-break-inside: avoid;
@@ -192,6 +201,9 @@ const PackageDetails = () => {
                 }
                 thead {
                   display: table-header-group;
+                }
+                .overflow-x-auto {
+                  overflow: visible !important;
                 }
               }
             `}</style>
@@ -251,22 +263,6 @@ const PackageDetails = () => {
                   )}
                 </div>
               </div>
-
-              <div className="border-t pt-4">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">Package Overview</h2>
-                <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                  {pkg.overview || `Experience the best of ${pkg.category} with this carefully curated package. 
-                  Enjoy comfortable accommodations, guided tours, and unforgettable experiences 
-                  that will create memories to last a lifetime. This package is designed to give 
-                  you the perfect blend of adventure, relaxation, and cultural immersion.`}
-                </div>
-                
-                {pkg.additionalInfo && (
-                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-900 whitespace-pre-line">{pkg.additionalInfo}</p>
-                  </div>
-                )}
-              </div>
             </div>
 
             {/* Pricing Table */}
@@ -287,7 +283,6 @@ const PackageDetails = () => {
                 
                 return (
                   <div className="bg-white rounded-lg p-6 mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Hotel to be Use</h2>
                     <p className="text-sm text-gray-700 mb-6">
                       BELOW RATES ARE PER PERSON NET & NON COMMISSIONABLE
                     </p>
@@ -340,7 +335,6 @@ const PackageDetails = () => {
                 // OLD FORMAT: Fixed 4 columns (backward compatibility)
                 return (
                   <div className="bg-white rounded-lg p-6 mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Hotel to be Use</h2>
                     <p className="text-sm text-gray-700 mb-6">
                       BELOW RATES ARE PER PERSON NET & NON COMMISSIONABLE
                     </p>
