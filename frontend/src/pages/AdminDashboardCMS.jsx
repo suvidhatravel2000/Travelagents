@@ -336,7 +336,7 @@ const AdminDashboardCMS = () => {
       {/* Media Gallery Modal */}
       {showMediaGallery && (
         <MediaGallery
-          onSelectImage={(url) => {
+          onSelect={(url) => {
             navigator.clipboard.writeText(url);
             alert('✅ Image URL copied to clipboard!');
             setShowMediaGallery(false);
