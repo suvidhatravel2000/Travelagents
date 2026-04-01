@@ -3,6 +3,7 @@ from typing import Optional
 from models_pages import HolidayPageConfig, HolidayPageConfigCreate
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import datetime
+import uuid
 
 router = APIRouter(prefix="/api/pages", tags=["holiday-pages"])
 

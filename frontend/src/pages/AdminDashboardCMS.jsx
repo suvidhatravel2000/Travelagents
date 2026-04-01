@@ -11,7 +11,9 @@ import {
   Type,
   Eye,
   EyeOff,
-  Save
+  Save,
+  Plane,
+  Globe
 } from 'lucide-react';
 import { packagesAPI, destinationsAPI, bannersAPI, settingsAPI, authAPI } from '../api/client';
 import { cmsAPI } from '../api/cms';
@@ -26,6 +28,8 @@ import SectionVisibilityControl from '../components/admin/SectionVisibilityContr
 import DestinationsEditor from '../components/admin/DestinationsEditor';
 import TrendingPackagesEditor from '../components/admin/TrendingPackagesEditor';
 import MediaGallery from '../components/admin/MediaGallery';
+import IndiaHolidayEditor from '../components/admin/IndiaHolidayEditor';
+import InternationalHolidayEditor from '../components/admin/InternationalHolidayEditor';
 
 const AdminDashboardCMS = () => {
   const navigate = useNavigate();
@@ -186,6 +190,28 @@ const AdminDashboardCMS = () => {
             <span>Section Visibility</span>
           </button>
 
+          {/* India Holiday Page Button */}
+          <button
+            onClick={() => setActiveTab('india-holidays')}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              activeTab === 'india-holidays' ? 'bg-orange-500' : 'hover:bg-gray-800'
+            }`}
+          >
+            <Plane className="h-5 w-5" />
+            <span>🇮🇳 India Holidays</span>
+          </button>
+
+          {/* International Holiday Page Button */}
+          <button
+            onClick={() => setActiveTab('international-holidays')}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              activeTab === 'international-holidays' ? 'bg-orange-500' : 'hover:bg-gray-800'
+            }`}
+          >
+            <Globe className="h-5 w-5" />
+            <span>🌍 International Holidays</span>
+          </button>
+
           {/* Media Gallery Button */}
           <button
             onClick={() => setShowMediaGallery(true)}
@@ -234,6 +260,8 @@ const AdminDashboardCMS = () => {
             {activeTab === 'trending' && 'Trending Packages'}
             {activeTab === 'footer' && 'Footer Control'}
             {activeTab === 'visibility' && 'Section Visibility'}
+            {activeTab === 'india-holidays' && 'India Holiday Page'}
+            {activeTab === 'international-holidays' && 'International Holiday Page'}
             {activeTab === 'settings' && 'Company Settings'}
           </h1>
           <p className="text-gray-600 mt-1">Manage your website content and appearance</p>
@@ -301,6 +329,9 @@ const AdminDashboardCMS = () => {
         {activeTab === 'destinations' && <DestinationsEditor />}
         {activeTab === 'trending' && <TrendingPackagesEditor />}
         {activeTab === 'footer' && <FooterEditor />}
+        {activeTab === 'visibility' && <SectionVisibilityControl />}
+        {activeTab === 'india-holidays' && <IndiaHolidayEditor />}
+        {activeTab === 'international-holidays' && <InternationalHolidayEditor />}
 
       {/* Media Gallery Modal */}
       {showMediaGallery && (

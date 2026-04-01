@@ -15,6 +15,7 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
     title: '',
     destination: '',
     category: '',
+    region: 'india', // Default to India
     image: '',
     rating: 0,
     duration: '',
@@ -434,6 +435,19 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
                     onChange={(e) => setFormData({...formData, category: e.target.value})}
                     className="w-full px-4 py-2 border rounded-lg"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Region *</label>
+                  <select
+                    value={formData.region || 'india'}
+                    onChange={(e) => setFormData({...formData, region: e.target.value})}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  >
+                    <option value="india">🇮🇳 India</option>
+                    <option value="international">🌍 International</option>
+                    <option value="both">🌐 Both</option>
+                  </select>
                 </div>
               </div>
 
