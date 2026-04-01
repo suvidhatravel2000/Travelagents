@@ -28,28 +28,24 @@ Build a pixel-perfect clone of `https://www.viacation.com/` with an Admin Dashbo
 
 ### CMS Admin Panel
 - **Top Bar Editor** — Edit announcement bar text/links
-- **Hero Banners Editor** — Drag & drop reorder, desktop/mobile images, advanced styling, Media Gallery integration
-- **Packages Manager** — Bulk import, smart paste, dynamic pricing/hotels/itineraries, Media Gallery integration, **SEO tab with live score**
+- **Hero Banners Editor** — Drag & drop reorder, desktop/mobile images, advanced styling, Media Gallery integration, **Description, Offer Price, Original Price, Duration, Features/Tags (e.g. Flights Included)**
+- **Packages Manager** — Bulk import, smart paste, dynamic pricing/hotels/itineraries, Media Gallery integration, SEO tab with live score
 - **Destinations Editor** — Manage destination tabs
 - **Trending Packages Editor** — Select featured packages
 - **Footer Editor** — Edit footer content
 - **Section Visibility Control** — Toggle homepage sections
-- **India Holiday Page Editor** — Banner config with Media Gallery, tabs, header dropdown, search, trending, **SEO section with live score**
-- **International Holiday Page Editor** — Same as India, with **SEO section with live score**
+- **India Holiday Page Editor** — Banner config with Media Gallery, tabs, header dropdown, search, trending, SEO section with live score
+- **International Holiday Page Editor** — Same as India
 - **Media Gallery** — Upload, display, select, delete images
 
-### SEO Features (NEW)
-- **SEO Score Widget** (`SeoScoreWidget.jsx`) — Reusable component across all admin editors
-  - Real-time SEO score (0-100%) with animated ring indicator
-  - Color-coded: Red (<40%), Orange (40-70%), Green (>70%)
-  - Focus Keyword, SEO Title (with 0/60 char counter), Meta Description (with 0/160 char counter)
-  - Live Google Search Preview
-  - Actionable suggestions with checkmarks/warnings
-- **Score Calculation**: +20 title 50-60 chars, +20 desc 140-160 chars, +20 keyword in title, +20 keyword in desc, +20 keyword in content
-- **Public Pages**: Dynamic `<title>`, `<meta name="description">`, `<meta name="keywords">` via react-helmet-async
+### SEO Features
+- Reusable SEO Score Widget with live score ring, Google preview, suggestions
+- Score: +20 title 50-60 chars, +20 desc 140-160 chars, +20 keyword in title/desc/content
+- Public pages output dynamic meta tags via react-helmet-async
 
 ## Completed Tasks (Latest First)
-- [Feb 2026] SEO fields + live score widget added to Packages, India Holidays, International Holidays (admin + public meta tags)
+- [Feb 2026] Made Banner fields editable: Description, Offer Price, Original Price, Duration, Features/Tags
+- [Feb 2026] SEO fields + live score widget added to Packages, India Holidays, International Holidays
 - [Feb 2026] Integrated Media Gallery "Select" into Packages & all Banner editors
 - [Feb 2026] Fixed Media Gallery image loading (gray boxes → working via `/api/uploads/`)
 - [Feb 2026] Built new simplified Media Gallery system
@@ -58,12 +54,6 @@ Build a pixel-perfect clone of `https://www.viacation.com/` with an Admin Dashbo
 ## Backlog
 - **P1**: Refactor `EnhancedPackageModal.jsx` (>1300 lines) into smaller sub-components
 - **P2**: Media Gallery lazy loading / pagination
-
-## Architecture Notes
-- All backend routes prefixed with `/api` (K8s ingress requirement)
-- Static images stored at `/api/uploads/` path (CRITICAL: do not revert)
-- SEO fields stored in MongoDB: `seo_title`, `seo_description`, `focus_keyword` on packages and holiday_pages collections
-- react-helmet-async wraps entire app via `<HelmetProvider>` in App.js
 
 ## Admin Credentials
 - Username: `admin`
