@@ -96,10 +96,12 @@ const AdminDashboardCMS = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-gray-900 text-white p-6 z-50 overflow-y-auto pb-24">
-        <h2 className="text-2xl font-bold mb-8">CMS Panel</h2>
+      <div className="fixed left-0 top-0 h-full w-64 bg-gray-900 text-white flex flex-col z-50">
+        <div className="p-6">
+          <h2 className="text-2xl font-bold">CMS Panel</h2>
+        </div>
         
-        <nav className="space-y-1 mb-20">
+        <nav className="flex-1 overflow-y-auto px-6 space-y-1">
           <button
             onClick={() => setActiveTab('overview')}
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
@@ -188,6 +190,7 @@ const AdminDashboardCMS = () => {
           <button
             onClick={() => setShowMediaGallery(true)}
             className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors hover:bg-gray-800 border border-gray-700 mt-2"
+            style={{ zIndex: 10, position: 'relative', minHeight: '48px' }}
           >
             <ImageIcon className="h-5 w-5" />
             <span>📸 Media Gallery</span>
@@ -205,13 +208,17 @@ const AdminDashboardCMS = () => {
           </button>
         </nav>
 
-        <button
-          onClick={handleLogout}
-          className="absolute bottom-6 left-6 right-6 flex items-center space-x-3 px-4 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition-colors"
-        >
-          <LogOut className="h-5 w-5" />
-          <span>Logout</span>
-        </button>
+        {/* Logout Button - Fixed at bottom */}
+        <div className="p-6 border-t border-gray-800">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition-colors"
+            style={{ zIndex: 5, position: 'relative' }}
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Logout</span>
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}
