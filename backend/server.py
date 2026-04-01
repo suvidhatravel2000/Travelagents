@@ -8,7 +8,7 @@ import logging
 from pathlib import Path
 
 # Import routes
-from routes import packages, destinations, banners, settings, auth, media
+from routes import packages, destinations, banners, settings, auth, media, pages
 from routes import cms_topbar, cms_footer, cms_homepage
 
 ROOT_DIR = Path(__file__).parent
@@ -44,6 +44,7 @@ app.include_router(cms_topbar.router)
 app.include_router(cms_footer.router)
 app.include_router(cms_homepage.router)
 app.include_router(media.router)
+app.include_router(pages.router)
 app.include_router(api_router)
 
 app.add_middleware(

@@ -62,6 +62,9 @@ class PackageBase(BaseModel):
     # Trending control
     isTrending: Optional[bool] = False
     trendingOrder: Optional[int] = None
+    
+    # Region assignment for holiday pages
+    region: Optional[str] = "india"  # "india" or "international" or "both"
 
 class PackageCreate(PackageBase):
     pass
