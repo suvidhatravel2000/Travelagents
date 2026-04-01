@@ -90,8 +90,10 @@ const Header = () => {
                 onMouseLeave={handleIndiaLeave}
               >
                 <button className="flex items-center text-gray-700 hover:text-orange-500 transition-colors">
-                  India Holidays
-                  <ChevronDown className="ml-1 h-4 w-4" />
+                  <Link to="/india-holidays" className="flex items-center">
+                    India Holidays
+                    <ChevronDown className="ml-1 h-4 w-4" />
+                  </Link>
                 </button>
                 {indiaHolidaysOpen && (
                   <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 border border-gray-100">
@@ -118,8 +120,10 @@ const Header = () => {
                 onMouseLeave={handleIntlLeave}
               >
                 <button className="flex items-center text-gray-700 hover:text-orange-500 transition-colors">
-                  International Holidays
-                  <ChevronDown className="ml-1 h-4 w-4" />
+                  <Link to="/international-holidays" className="flex items-center">
+                    International Holidays
+                    <ChevronDown className="ml-1 h-4 w-4" />
+                  </Link>
                 </button>
                 {internationalHolidaysOpen && (
                   <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 border border-gray-100">

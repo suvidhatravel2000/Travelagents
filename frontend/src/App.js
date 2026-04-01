@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import DestinationPage from "./pages/DestinationPage";
 import PackageDetails from "./pages/PackageDetails";
+import IndiaHolidays from "./pages/IndiaHolidays";
+import InternationalHolidays from "./pages/InternationalHolidays";
 import SearchResults from "./pages/SearchResults";
 import Blog from "./pages/Blog";
 import AdminLogin from "./pages/AdminLogin";
@@ -16,6 +18,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/india-holidays" element={<IndiaHolidays />} />
+          <Route path="/international-holidays" element={<InternationalHolidays />} />
           <Route path="/destination/:destinationId" element={<DestinationPage />} />
           <Route path="/package/:packageId" element={<PackageDetails />} />
           <Route path="/search" element={<SearchResults />} />
