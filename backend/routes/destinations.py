@@ -68,7 +68,10 @@ async def delete_destination(
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Delete a destination"""
-    result = await db.destinations.delete_one({"id": destination_id})
+    # Delete ALL destinations with this ID (in case of duplicates)
+    result = await db.destinations.delete_many({"id": destination_id})
+    
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Destination not found")
-    return {"message": "Destination deleted successfully"}
+    
+    return {"message": f"Deleted {result.deleted_count} destination(s) successfully"}

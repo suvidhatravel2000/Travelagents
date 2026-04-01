@@ -93,7 +93,8 @@ const SortableDestination = ({ destination, onUpdate, onDelete }) => {
       {/* Delete Button */}
       <button
         onClick={() => onDelete(destination.id)}
-        className="text-red-600 hover:text-red-800"
+        className="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded"
+        title="Delete destination"
       >
         <Trash2 className="h-5 w-5" />
       </button>
@@ -105,6 +106,7 @@ const DestinationsEditor = () => {
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -148,15 +150,36 @@ const DestinationsEditor = () => {
     );
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this destination?')) {
-      setDestinations((prev) => prev.filter((dest) => dest.id !== id));
+  const handleDelete = async (id) => {
+    const dest = destinations.find(d => d.id === id);
+    if (!window.confirm(`Are you sure you want to delete "${dest.name}"?`)) {
+      return;
+    }
+
+    // If it's a temp destination (not saved), just remove from state
+    if (id.startsWith('temp-dest-')) {
+      setDestinations((prev) => prev.filter((d) => d.id !== id));
+      return;
+    }
+
+    // Otherwise, delete from backend
+    try {
+      setDeleting(true);
+      await destinationsAPI.delete(id);
+      setDestinations((prev) => prev.filter((d) => d.id !== id));
+      alert(`✅ "${dest.name}" deleted successfully!`);
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert(`Failed to delete "${dest.name}": ${err.message}`);
+    } finally {
+      setDeleting(false);
     }
   };
 
   const handleAddDestination = () => {
+    const timestamp = Date.now();
     const newDest = {
-      id: `dest-${Date.now()}`,
+      id: `temp-dest-${timestamp}`, // Use timestamp for unique temp ID
       name: 'New Destination',
       icon: '🌍',
       trending: false,
@@ -176,24 +199,39 @@ const DestinationsEditor = () => {
         order: index
       }));
 
-      // Separate new and existing destinations
-      const newDests = updatedDestinations.filter(d => d.id.startsWith('dest-'));
-      const existingDests = updatedDestinations.filter(d => !d.id.startsWith('dest-'));
+      // Separate new, existing, and deleted destinations
+      const newDests = updatedDestinations.filter(d => d.id.startsWith('temp-dest-'));
+      const existingDests = updatedDestinations.filter(d => !d.id.startsWith('temp-dest-'));
 
       // Update existing destinations
       for (const dest of existingDests) {
-        await destinationsAPI.update(dest.id, dest);
+        try {
+          await destinationsAPI.update(dest.id, dest);
+        } catch (err) {
+          console.error(`Failed to update ${dest.name}:`, err);
+        }
       }
 
-      // Create new destinations (with generated IDs)
+      // Create new destinations with proper IDs
       for (const dest of newDests) {
-        const { id, ...destData } = dest; // Remove temp ID
-        const newId = destData.name.toLowerCase().replace(/\s+/g, '-');
-        await destinationsAPI.create({ ...destData, id: newId });
+        try {
+          const { id, ...destData } = dest; // Remove temp ID
+          // Generate clean ID from name
+          const cleanId = destData.name
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+            .replace(/\s+/g, '-') // Replace spaces with hyphens
+            .replace(/-+/g, '-'); // Remove duplicate hyphens
+          
+          await destinationsAPI.create({ ...destData, id: cleanId });
+        } catch (err) {
+          console.error(`Failed to create ${dest.name}:`, err);
+          alert(`Failed to create ${dest.name}: ${err.message}`);
+        }
       }
 
       alert('✅ Destinations saved successfully!');
-      fetchDestinations(); // Refresh
+      await fetchDestinations(); // Refresh
     } catch (err) {
       console.error('Error saving destinations:', err);
       alert('Failed to save destinations: ' + err.message);
