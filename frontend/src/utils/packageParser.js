@@ -5,54 +5,81 @@
  * Handles formats like:
  * "Standard | 7452 | 7047 | 6282 | 5700"
  * "Standard 7452 7047 6282 5700"
+ * Now supports UNLIMITED columns!
  */
 export const parsePricingTable = (text) => {
   if (!text || !text.trim()) return [];
   
   const lines = text.split('\n').filter(line => line.trim());
   const results = [];
+  let headerColumns = null;
+  
+  // Try to detect header row to get column names
+  for (const line of lines) {
+    if (line.toLowerCase().includes('category') || 
+        (line.toLowerCase().includes('pax') && line.toLowerCase().includes('person'))) {
+      // This might be a header row
+      const cols = line.split(/[\|\t]/).map(c => c.trim()).filter(Boolean);
+      if (cols.length >= 2 && cols[0].toLowerCase().includes('category')) {
+        headerColumns = cols.slice(1); // Store column names
+        continue; // Skip header row
+      }
+    }
+  }
   
   for (const line of lines) {
     // Skip header lines
     if (line.toLowerCase().includes('category') || 
         line.toLowerCase().includes('per person') ||
-        line.toLowerCase().includes('pax') && line.toLowerCase().includes('extra bed')) {
+        (line.toLowerCase().includes('pax') && line.toLowerCase().includes('extra bed'))) {
       continue;
     }
     
-    // Extract numbers and category name
-    const parts = line.split(/[\|\t,]/).map(p => p.trim()).filter(Boolean);
+    if (line.includes('---') || line.length < 3) {
+      continue;
+    }
     
-    if (parts.length >= 4) {
-      // First part is category, rest are prices
+    // Extract category and all values (dynamic columns)
+    const parts = line.split(/[\|\t]/).map(p => p.trim()).filter(Boolean);
+    
+    if (parts.length >= 2) {
+      // First part is category, rest are column values
       const category = parts[0].replace(/[*\-•]/g, '').trim();
-      const numbers = parts.slice(1).map(p => {
-        const num = p.replace(/[^\d]/g, '');
-        return parseInt(num) || 0;
-      });
+      const values = parts.slice(1);
       
-      if (numbers.length >= 4) {
+      if (values.length > 0) {
+        // Dynamic columns format (NEW)
+        const columns = {};
+        values.forEach((value, idx) => {
+          const columnName = headerColumns && headerColumns[idx] 
+            ? headerColumns[idx].trim()
+            : `Column ${idx + 1}`;
+          columns[columnName] = value.trim();
+        });
+        
         results.push({
           category,
-          price2Pax: numbers[0],
-          price4Pax: numbers[1],
-          price6Pax: numbers[2],
-          extraBed: numbers[3]
+          columns
         });
       }
     } else {
       // Try space-separated format
       const tokens = line.split(/\s+/);
-      const nums = tokens.filter(t => /^\d+$/.test(t)).map(n => parseInt(n));
+      const category = tokens.filter(t => !/^[\d,]+$/.test(t.replace(/,/g, ''))).join(' ').trim();
+      const values = tokens.filter(t => /^[\d,]+$/.test(t.replace(/,/g, '')));
       
-      if (nums.length >= 4) {
-        const category = tokens.filter(t => !/^\d+$/.test(t)).join(' ').trim();
+      if (values.length >= 1 && category) {
+        const columns = {};
+        values.forEach((value, idx) => {
+          const columnName = headerColumns && headerColumns[idx]
+            ? headerColumns[idx].trim()
+            : `Column ${idx + 1}`;
+          columns[columnName] = value.trim();
+        });
+        
         results.push({
           category: category || 'Unknown',
-          price2Pax: nums[0],
-          price4Pax: nums[1],
-          price6Pax: nums[2],
-          extraBed: nums[3]
+          columns
         });
       }
     }
