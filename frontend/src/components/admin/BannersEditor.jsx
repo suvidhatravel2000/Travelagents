@@ -13,7 +13,7 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Plus, Trash2, Save, Eye, EyeOff, Monitor, Smartphone, Image as ImageIcon } from 'lucide-react';
+import { GripVertical, Plus, Trash2, Save, Eye, EyeOff, Monitor, Smartphone, Image as ImageIcon, Plane, X } from 'lucide-react';
 import { bannersAPI } from '../../api/client';
 import MediaGallery from './MediaGallery';
 
@@ -146,6 +146,108 @@ const SortableBanner = ({ banner, onUpdate, onDelete }) => {
               onClose={() => setShowMediaGallery(false)}
             />
           )}
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <input
+              type="text"
+              value={banner.description || ''}
+              onChange={(e) => onUpdate(banner.id, 'description', e.target.value)}
+              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+              placeholder="Short description text"
+              data-testid="banner-description-input"
+            />
+          </div>
+
+          {/* Price, Original Price, Duration */}
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Offer Price (₹)</label>
+              <input
+                type="number"
+                value={banner.price || ''}
+                onChange={(e) => onUpdate(banner.id, 'price', e.target.value ? parseInt(e.target.value) : null)}
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+                placeholder="e.g. 17999"
+                data-testid="banner-price-input"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Original Price (₹)</label>
+              <input
+                type="number"
+                value={banner.originalPrice || ''}
+                onChange={(e) => onUpdate(banner.id, 'originalPrice', e.target.value ? parseInt(e.target.value) : null)}
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+                placeholder="e.g. 25999"
+                data-testid="banner-original-price-input"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+              <input
+                type="text"
+                value={banner.duration || ''}
+                onChange={(e) => onUpdate(banner.id, 'duration', e.target.value)}
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+                placeholder="e.g. 5N/6D"
+                data-testid="banner-duration-input"
+              />
+            </div>
+          </div>
+
+          {/* Features (e.g. Flights Included) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center space-x-1">
+                <Plane className="h-4 w-4" />
+                <span>Features / Tags</span>
+                <span className="text-xs text-gray-400">(shown as badges on banner)</span>
+              </div>
+            </label>
+            <div className="space-y-2">
+              {(banner.features || []).map((feature, idx) => (
+                <div key={idx} className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={feature}
+                    onChange={(e) => {
+                      const newFeatures = [...(banner.features || [])];
+                      newFeatures[idx] = e.target.value;
+                      onUpdate(banner.id, 'features', newFeatures);
+                    }}
+                    className="flex-1 px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    placeholder="e.g. Flights Included"
+                    data-testid={`banner-feature-${idx}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newFeatures = (banner.features || []).filter((_, i) => i !== idx);
+                      onUpdate(banner.id, 'features', newFeatures);
+                    }}
+                    className="text-red-500 hover:text-red-700 p-1"
+                    data-testid={`banner-feature-remove-${idx}`}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  const newFeatures = [...(banner.features || []), ''];
+                  onUpdate(banner.id, 'features', newFeatures);
+                }}
+                className="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-800"
+                data-testid="banner-add-feature-btn"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add Feature</span>
+              </button>
+            </div>
+          </div>
 
           {/* Advanced Styling Toggle */}
           <button
