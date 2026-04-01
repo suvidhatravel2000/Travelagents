@@ -404,13 +404,24 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Image URL *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
+                  <span>Image URL *</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowMediaGallery(true)}
+                    className="text-blue-600 hover:text-blue-800 flex items-center space-x-1 text-xs"
+                  >
+                    <ImageIcon className="h-4 w-4" />
+                    <span>Browse Gallery</span>
+                  </button>
+                </label>
                 <input
                   type="url"
                   required
                   value={formData.image}
                   onChange={(e) => setFormData({...formData, image: e.target.value})}
                   className="w-full px-4 py-2 border rounded-lg"
+                  placeholder="https://example.com/image.jpg or select from gallery"
                 />
               </div>
 
