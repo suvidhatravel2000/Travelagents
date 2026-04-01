@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom';
 import { Search, Menu, X, ChevronDown } from 'lucide-react';
 import { settingsAPI } from '../api/client';
 import { cmsAPI } from '../api/cms';
+import { holidayPagesAPI } from '../api/client';
 
 const Header = () => {
   const [companyInfo, setCompanyInfo] = useState(null);
   const [topBar, setTopBar] = useState(null);
+  const [indiaConfig, setIndiaConfig] = useState(null);
+  const [internationalConfig, setInternationalConfig] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [indiaHolidaysOpen, setIndiaHolidaysOpen] = useState(false);
   const [internationalHolidaysOpen, setInternationalHolidaysOpen] = useState(false);
@@ -36,12 +39,16 @@ const Header = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const [data, topBarData] = await Promise.all([
+        const [data, topBarData, indiaData, intlData] = await Promise.all([
           settingsAPI.get(),
-          cmsAPI.getTopBar()
+          cmsAPI.getTopBar(),
+          holidayPagesAPI.get('india'),
+          holidayPagesAPI.get('international')
         ]);
         setCompanyInfo(data);
         setTopBar(topBarData);
+        setIndiaConfig(indiaData);
+        setInternationalConfig(intlData);
       } catch (err) {
         console.error('Error fetching settings:', err);
       }
@@ -53,6 +60,48 @@ const Header = () => {
   if (!companyInfo) {
     return null;
   }
+
+  // Get dropdown items for India Holidays
+  const getIndiaDropdownItems = () => {
+    if (!indiaConfig || !indiaConfig.tabs) return [];
+    
+    // If headerDropdown is configured and not empty, use it
+    if (indiaConfig.headerDropdown && indiaConfig.headerDropdown.length > 0) {
+      return indiaConfig.tabs
+        .filter(tab => indiaConfig.headerDropdown.includes(tab.name) && tab.visible)
+        .map(tab => ({ name: tab.name, icon: tab.icon }));
+    }
+    
+    // Otherwise, show all visible tabs
+    return indiaConfig.tabs
+      .filter(tab => tab.visible)
+      .map(tab => ({ name: tab.name, icon: tab.icon }));
+  };
+
+  // Get dropdown items for International Holidays
+  const getInternationalDropdownItems = () => {
+    if (!internationalConfig || !internationalConfig.tabs) return [];
+    
+    // If headerDropdown is configured and not empty, use it
+    if (internationalConfig.headerDropdown && internationalConfig.headerDropdown.length > 0) {
+      return internationalConfig.tabs
+        .filter(tab => internationalConfig.headerDropdown.includes(tab.name) && tab.visible)
+        .map(tab => ({ name: tab.name, icon: tab.icon }));
+    }
+    
+    // Otherwise, show all visible tabs
+    return internationalConfig.tabs
+      .filter(tab => tab.visible)
+      .map(tab => ({ name: tab.name, icon: tab.icon }));
+  };
+
+  const indiaDropdownItems = getIndiaDropdownItems();
+  const internationalDropdownItems = getInternationalDropdownItems();
+
+  // Helper function to convert destination name to URL slug
+  const toSlug = (name) => {
+    return name.toLowerCase().replace(/\s+/g, '-');
+  };
 
   return (
     <>
@@ -95,20 +144,18 @@ const Header = () => {
                     <ChevronDown className="ml-1 h-4 w-4" />
                   </Link>
                 </button>
-                {indiaHolidaysOpen && (
+                {indiaHolidaysOpen && indiaDropdownItems.length > 0 && (
                   <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 border border-gray-100">
-                    <Link to="/destination/ladakh" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500">
-                      Ladakh
-                    </Link>
-                    <Link to="/destination/himachal" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500">
-                      Himachal
-                    </Link>
-                    <Link to="/destination/chardham" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500">
-                      Chardham
-                    </Link>
-                    <Link to="/destination/north-east" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500">
-                      North East
-                    </Link>
+                    {indiaDropdownItems.map((item, index) => (
+                      <Link 
+                        key={index}
+                        to={`/destination/${toSlug(item.name)}`} 
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
+                      >
+                        {item.icon && <span className="mr-2">{item.icon}</span>}
+                        {item.name}
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>
@@ -125,26 +172,18 @@ const Header = () => {
                     <ChevronDown className="ml-1 h-4 w-4" />
                   </Link>
                 </button>
-                {internationalHolidaysOpen && (
+                {internationalHolidaysOpen && internationalDropdownItems.length > 0 && (
                   <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 border border-gray-100">
-                    <Link to="/destination/thailand" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500">
-                      Thailand
-                    </Link>
-                    <Link to="/destination/bali" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500">
-                      Bali
-                    </Link>
-                    <Link to="/destination/singapore" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500">
-                      Singapore
-                    </Link>
-                    <Link to="/destination/maldives" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500">
-                      Maldives
-                    </Link>
-                    <Link to="/destination/malaysia" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500">
-                      Malaysia
-                    </Link>
-                    <Link to="/destination/sri-lanka" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500">
-                      Sri Lanka
-                    </Link>
+                    {internationalDropdownItems.map((item, index) => (
+                      <Link 
+                        key={index}
+                        to={`/destination/${toSlug(item.name)}`} 
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
+                      >
+                        {item.icon && <span className="mr-2">{item.icon}</span>}
+                        {item.name}
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>

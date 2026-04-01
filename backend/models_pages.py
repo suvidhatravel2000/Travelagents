@@ -51,6 +51,9 @@ class HolidayPageConfig(BaseModel):
     search: PageSearchConfig = PageSearchConfig()
     trending: PageTrendingConfig = PageTrendingConfig()
     
+    # Header Dropdown Control
+    headerDropdown: List[str] = []  # Tab names to show in Header dropdown
+    
     # Meta
     visible: bool = True
     createdAt: datetime = Field(default_factory=datetime.utcnow)
@@ -66,4 +69,5 @@ class HolidayPageConfigCreate(BaseModel):
     tabs: List[PageTab] = []
     search: PageSearchConfig = PageSearchConfig()
     trending: PageTrendingConfig = PageTrendingConfig()
+    headerDropdown: List[str] = []  # Tab names to show in Header dropdown
     visible: bool = True

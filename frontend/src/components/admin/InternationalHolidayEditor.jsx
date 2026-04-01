@@ -74,6 +74,7 @@ const InternationalHolidayEditor = () => {
   const [expandedSections, setExpandedSections] = useState({
     banner: true,
     tabs: true,
+    headerDropdown: true,
     search: true,
     trending: true
   });
@@ -174,6 +175,20 @@ const InternationalHolidayEditor = () => {
       ...prev,
       search: { ...prev.search, [field]: value }
     }));
+  };
+
+  // Header Dropdown handlers
+  const toggleHeaderDropdown = (tabName) => {
+    setConfig(prev => {
+      const currentDropdown = prev.headerDropdown || [];
+      const newDropdown = currentDropdown.includes(tabName)
+        ? currentDropdown.filter(name => name !== tabName)
+        : [...currentDropdown, tabName];
+      return {
+        ...prev,
+        headerDropdown: newDropdown
+      };
+    });
   };
 
   // Trending handlers
@@ -381,6 +396,60 @@ const InternationalHolidayEditor = () => {
 
               {config.tabs.length === 0 && (
                 <p className="text-center text-gray-500 py-8">No tabs added yet. Click "Add Tab" to get started.</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Header Dropdown Menu Control */}
+        <div className="bg-white rounded-lg border">
+          <button
+            onClick={() => toggleSection('headerDropdown')}
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
+          >
+            <div className="flex items-center space-x-3">
+              <span className="text-xl">🔗</span>
+              <h3 className="text-lg font-semibold">Header Dropdown Menu ({(config.headerDropdown || []).length} selected)</h3>
+            </div>
+            {expandedSections.headerDropdown ? <ChevronUp /> : <ChevronDown />}
+          </button>
+          
+          {expandedSections.headerDropdown && (
+            <div className="p-4 border-t space-y-3">
+              <p className="text-sm text-gray-600 mb-3">
+                Select which destination tabs should appear in the main header dropdown menu.
+              </p>
+              
+              {config.tabs.length === 0 ? (
+                <p className="text-center text-gray-500 py-4">
+                  No tabs available. Add destination tabs first.
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {config.tabs.map(tab => (
+                    <label key={tab.id} className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded border">
+                      <input
+                        type="checkbox"
+                        checked={(config.headerDropdown || []).includes(tab.name)}
+                        onChange={() => toggleHeaderDropdown(tab.name)}
+                        className="w-4 h-4 text-orange-500"
+                      />
+                      <span className="text-lg">{tab.icon}</span>
+                      <span className="flex-1 font-medium">{tab.name || '(Unnamed Tab)'}</span>
+                      {!tab.visible && (
+                        <span className="text-xs text-gray-400">(Hidden)</span>
+                      )}
+                    </label>
+                  ))}
+                </div>
+              )}
+              
+              {config.tabs.length > 0 && (
+                <div className="mt-3 pt-3 border-t">
+                  <p className="text-xs text-gray-500">
+                    💡 Tip: If no tabs are selected, all visible tabs will be shown in the header dropdown by default.
+                  </p>
+                </div>
               )}
             </div>
           )}

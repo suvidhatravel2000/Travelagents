@@ -54,6 +54,7 @@ async def get_page_config(
                 "displayCount": 6,
                 "layout": "grid"
             },
+            "headerDropdown": [],
             "visible": True,
             "createdAt": datetime.utcnow(),
             "updatedAt": datetime.utcnow()
@@ -79,7 +80,9 @@ async def update_page_config(
         # Update existing
         update_data = config_update.dict()
         update_data["updatedAt"] = datetime.utcnow()
-        update_data["pageType"] = page_type
+        # Ensure pageType matches the URL parameter
+        if update_data.get("pageType") != page_type:
+            update_data["pageType"] = page_type
         
         await db.holiday_pages.update_one(
             {"pageType": page_type},
@@ -91,7 +94,9 @@ async def update_page_config(
     else:
         # Create new
         config_data = config_update.dict()
-        config_data["pageType"] = page_type
+        # Ensure pageType matches the URL parameter
+        if config_data.get("pageType") != page_type:
+            config_data["pageType"] = page_type
         config_data["id"] = str(uuid.uuid4())
         config_data["createdAt"] = datetime.utcnow()
         config_data["updatedAt"] = datetime.utcnow()
