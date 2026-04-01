@@ -96,10 +96,10 @@ const AdminDashboardCMS = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-gray-900 text-white p-6 z-50 overflow-y-auto">
+      <div className="fixed left-0 top-0 h-full w-64 bg-gray-900 text-white p-6 z-50 overflow-y-auto pb-24">
         <h2 className="text-2xl font-bold mb-8">CMS Panel</h2>
         
-        <nav className="space-y-1">
+        <nav className="space-y-1 mb-20">
           <button
             onClick={() => setActiveTab('overview')}
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
