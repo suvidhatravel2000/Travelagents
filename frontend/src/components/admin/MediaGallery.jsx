@@ -212,7 +212,7 @@ const MediaGallery = ({ onSelectImage, onClose }) => {
 
   // Copy URL to clipboard
   const handleCopyUrl = (url) => {
-    const fullUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
+    const fullUrl = getImageUrl(url);
     navigator.clipboard.writeText(fullUrl);
     setCopiedUrl(url);
     setTimeout(() => setCopiedUrl(''), 2000);
@@ -223,7 +223,14 @@ const MediaGallery = ({ onSelectImage, onClose }) => {
     const fullUrl = image.url.startsWith('http') ? image.url : `${API_URL}${image.url}`;
     if (onSelectImage) {
       onSelectImage(fullUrl);
+      onClose(); // Close modal after selection
     }
+  };
+
+  // Get full image URL
+  const getImageUrl = (url) => {
+    if (!url) return '';
+    return url.startsWith('http') ? url : `${API_URL}${url}`;
   };
 
   return (
@@ -395,17 +402,21 @@ const MediaGallery = ({ onSelectImage, onClose }) => {
                   {images.map((image) => (
                     <div
                       key={image.id}
-                      className="group relative bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                      className="group relative bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
                     >
-                      {/* Image Preview */}
+                      {/* Image Preview - Clickable */}
                       <div
-                        className="aspect-square bg-gray-100 overflow-hidden"
+                        className="aspect-square bg-gray-100 overflow-hidden cursor-pointer"
                         onClick={() => handleSelectImage(image)}
                       >
                         <img
-                          src={`${API_URL}${image.thumbnailUrl || image.url}`}
+                          src={getImageUrl(image.thumbnailUrl || image.url)}
                           alt={image.originalName}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          onError={(e) => {
+                            console.error('Image failed to load:', image.originalName);
+                            e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+';
+                          }}
                         />
                       </div>
 
@@ -420,50 +431,57 @@ const MediaGallery = ({ onSelectImage, onClose }) => {
                       </div>
 
                       {/* Actions Overlay */}
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-opacity flex items-center justify-center space-x-2 opacity-0 group-hover:opacity-100">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCopyUrl(image.url);
-                          }}
-                          className="p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors"
-                          title="Copy URL"
-                        >
-                          {copiedUrl === image.url ? (
-                            <Check className="h-4 w-4 text-green-600" />
-                          ) : (
-                            <Copy className="h-4 w-4 text-gray-700" />
-                          )}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedImage(image);
-                            setEditImageName(image.originalName);
-                            setShowEditName(true);
-                          }}
-                          className="p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors"
-                          title="Edit Name"
-                        >
-                          <Edit2 className="h-4 w-4 text-gray-700" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedImage(image);
-                            setShowDeleteConfirm(true);
-                          }}
-                          className="p-2 bg-white rounded-lg hover:bg-red-50 transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 className="h-4 w-4 text-red-600" />
-                        </button>
-                      </div>
-
-                      {/* Select Badge */}
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-medium">
-                          Select
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-opacity opacity-0 group-hover:opacity-100">
+                        {/* Select Button (Primary Action) */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <button
+                            onClick={() => handleSelectImage(image)}
+                            className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold text-sm flex items-center space-x-2"
+                          >
+                            <ImageIcon className="h-5 w-5" />
+                            <span>Select Image</span>
+                          </button>
+                        </div>
+                        
+                        {/* Action Buttons (Bottom Right) */}
+                        <div className="absolute bottom-2 right-2 flex space-x-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCopyUrl(image.url);
+                            }}
+                            className="p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+                            title="Copy URL"
+                          >
+                            {copiedUrl === image.url ? (
+                              <Check className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <Copy className="h-4 w-4 text-gray-700" />
+                            )}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedImage(image);
+                              setEditImageName(image.originalName);
+                              setShowEditName(true);
+                            }}
+                            className="p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+                            title="Edit Name"
+                          >
+                            <Edit2 className="h-4 w-4 text-gray-700" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedImage(image);
+                              setShowDeleteConfirm(true);
+                            }}
+                            className="p-2 bg-white rounded-lg hover:bg-red-50 transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          </button>
                         </div>
                       </div>
                     </div>

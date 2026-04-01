@@ -55,8 +55,36 @@ app.add_middleware(
 )
 
 
-# Serve uploaded files
-app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
+# Serve uploaded files with CORS support
+from fastapi.responses import FileResponse
+from fastapi import HTTPException
+
+@app.get("/uploads/{file_path:path}")
+async def serve_uploads(file_path: str):
+    """Serve uploaded files with proper CORS headers"""
+    file_location = f"/app/uploads/{file_path}"
+    if not os.path.exists(file_location):
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Determine content type
+    content_type = "application/octet-stream"
+    if file_path.endswith(('.jpg', '.jpeg')):
+        content_type = "image/jpeg"
+    elif file_path.endswith('.png'):
+        content_type = "image/png"
+    elif file_path.endswith('.webp'):
+        content_type = "image/webp"
+    
+    return FileResponse(
+        file_location,
+        media_type=content_type,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+            "Cache-Control": "public, max-age=31536000"
+        }
+    )
 
 # Configure logging
 logging.basicConfig(
