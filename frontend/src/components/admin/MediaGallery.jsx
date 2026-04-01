@@ -237,7 +237,7 @@ const MediaGallery = ({ onSelectImage, onClose }) => {
               <span>Media Gallery</span>
             </h2>
             <p className="text-orange-100 text-sm mt-1">
-              {images.length} images • {folders.length} folders
+              {images.length} images • {folders.length + 1} folders
             </p>
           </div>
           <button
