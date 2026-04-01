@@ -197,71 +197,141 @@ const PackageDetails = () => {
             </div>
 
             {/* Pricing Table */}
-            {pkg.pricingTable && pkg.pricingTable.length > 0 && (
-              <div className="bg-white rounded-lg p-6 mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Hotel to be Use</h2>
-                <p className="text-sm text-gray-700 mb-6">
-                  BELOW RATES ARE PER PERSON NET & NON COMMISSIONABLE
-                </p>
+            {pkg.pricingTable && pkg.pricingTable.length > 0 && (() => {
+              // Detect if using new dynamic columns format or old fixed format
+              const hasNewFormat = pkg.pricingTable.some(row => row.columns && Object.keys(row.columns).length > 0);
+              
+              if (hasNewFormat) {
+                // NEW FORMAT: Dynamic columns
+                // Extract all unique column names from all rows
+                const allColumnNames = new Set();
+                pkg.pricingTable.forEach(row => {
+                  if (row.columns) {
+                    Object.keys(row.columns).forEach(col => allColumnNames.add(col));
+                  }
+                });
+                const columnHeaders = Array.from(allColumnNames);
                 
-                <div className="overflow-x-auto">
-                  <table className="w-full" style={{ borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ backgroundColor: '#d1d5db' }}>
-                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
-                          Category
-                        </th>
-                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
-                          Per Person (Min 2 Pax)
-                        </th>
-                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
-                          Per Person (Min 4 Pax)
-                        </th>
-                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
-                          Per Person (Min 6 Pax)
-                        </th>
-                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
-                          Extra bed
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {pkg.pricingTable.map((row, idx) => (
-                        <tr key={idx}>
-                          <td className="border border-gray-400 px-6 py-4 font-semibold text-gray-900">
-                            {row.category}
-                          </td>
-                          <td className="border border-gray-400 px-6 py-4 text-gray-900">
-                            {row.price2Pax || '-'}
-                          </td>
-                          <td className="border border-gray-400 px-6 py-4 text-gray-900">
-                            {row.price4Pax || '-'}
-                          </td>
-                          <td className="border border-gray-400 px-6 py-4 text-gray-900">
-                            {row.price6Pax || '-'}
-                          </td>
-                          <td className="border border-gray-400 px-6 py-4 text-gray-900">
-                            {row.extraBed || '-'}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                
-                {pkg.additionalInfo && (
-                  <div className="mt-4 text-gray-700 leading-relaxed">
-                    {pkg.additionalInfo}
+                return (
+                  <div className="bg-white rounded-lg p-6 mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Hotel to be Use</h2>
+                    <p className="text-sm text-gray-700 mb-6">
+                      BELOW RATES ARE PER PERSON NET & NON COMMISSIONABLE
+                    </p>
+                    
+                    <div className="overflow-x-auto">
+                      <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: '#d1d5db' }}>
+                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                              Category
+                            </th>
+                            {columnHeaders.map((header, idx) => (
+                              <th key={idx} className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                                {header}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pkg.pricingTable.map((row, idx) => (
+                            <tr key={idx}>
+                              <td className="border border-gray-400 px-6 py-4 font-semibold text-gray-900">
+                                {row.category}
+                              </td>
+                              {columnHeaders.map((header, colIdx) => (
+                                <td key={colIdx} className="border border-gray-400 px-6 py-4 text-gray-900">
+                                  {row.columns && row.columns[header] ? row.columns[header] : '-'}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    {pkg.additionalInfo && (
+                      <div className="mt-4 text-gray-700 leading-relaxed">
+                        {pkg.additionalInfo}
+                      </div>
+                    )}
+                    
+                    {pkg.vehicleInfo && (
+                      <p className="text-gray-700 mt-4">
+                        <strong>Vehicle Use:</strong> {pkg.vehicleInfo}
+                      </p>
+                    )}
                   </div>
-                )}
-                
-                {pkg.vehicleInfo && (
-                  <p className="text-gray-700 mt-4">
-                    <strong>Vehicle Use:</strong> {pkg.vehicleInfo}
-                  </p>
-                )}
-              </div>
-            )}
+                );
+              } else {
+                // OLD FORMAT: Fixed 4 columns (backward compatibility)
+                return (
+                  <div className="bg-white rounded-lg p-6 mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Hotel to be Use</h2>
+                    <p className="text-sm text-gray-700 mb-6">
+                      BELOW RATES ARE PER PERSON NET & NON COMMISSIONABLE
+                    </p>
+                    
+                    <div className="overflow-x-auto">
+                      <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: '#d1d5db' }}>
+                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                              Category
+                            </th>
+                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                              Per Person (Min 2 Pax)
+                            </th>
+                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                              Per Person (Min 4 Pax)
+                            </th>
+                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                              Per Person (Min 6 Pax)
+                            </th>
+                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                              Extra bed
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pkg.pricingTable.map((row, idx) => (
+                            <tr key={idx}>
+                              <td className="border border-gray-400 px-6 py-4 font-semibold text-gray-900">
+                                {row.category}
+                              </td>
+                              <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                                {row.price2Pax || '-'}
+                              </td>
+                              <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                                {row.price4Pax || '-'}
+                              </td>
+                              <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                                {row.price6Pax || '-'}
+                              </td>
+                              <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                                {row.extraBed || '-'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    {pkg.additionalInfo && (
+                      <div className="mt-4 text-gray-700 leading-relaxed">
+                        {pkg.additionalInfo}
+                      </div>
+                    )}
+                    
+                    {pkg.vehicleInfo && (
+                      <p className="text-gray-700 mt-4">
+                        <strong>Vehicle Use:</strong> {pkg.vehicleInfo}
+                      </p>
+                    )}
+                  </div>
+                );
+              }
+            })()}
 
             {/* Hotel Details */}
             {pkg.hotelDetails && pkg.hotelDetails.length > 0 && (
