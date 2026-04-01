@@ -69,9 +69,11 @@ const MediaGallery = ({ onSelect, onClose }) => {
   };
 
   const handleSelect = (image) => {
-    setSelectedImage(image.url);
+    // Create full URL for selection
+    const fullUrl = `${BACKEND_URL}${image.url}`;
+    setSelectedImage(fullUrl);
     if (onSelect) {
-      onSelect(image.url);
+      onSelect(fullUrl);
       if (onClose) onClose();
     }
   };
@@ -123,7 +125,7 @@ const MediaGallery = ({ onSelect, onClose }) => {
                   {/* Image */}
                   <div className="aspect-square bg-gray-100">
                     <img
-                      src={image.url}
+                      src={`${BACKEND_URL}${image.url}`}
                       alt={image.filename}
                       className="w-full h-full object-cover"
                       onError={(e) => {

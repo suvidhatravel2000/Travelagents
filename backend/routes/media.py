@@ -27,9 +27,6 @@ async def upload_images(
     """Upload single or multiple images"""
     uploaded_items = []
     
-    # Get backend URL from environment
-    backend_url = os.getenv('REACT_APP_BACKEND_URL', 'http://localhost:8001')
-    
     for file in files:
         # Validate file type
         allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
@@ -45,8 +42,8 @@ async def upload_images(
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        # Create full URL
-        file_url = f"{backend_url}/uploads/{unique_filename}"
+        # Create URL path (frontend will use REACT_APP_BACKEND_URL)
+        file_url = f"/uploads/{unique_filename}"
         
         # Save to database
         media_item = {
