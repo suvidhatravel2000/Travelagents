@@ -54,6 +54,11 @@ class HolidayPageConfig(BaseModel):
     # Header Dropdown Control
     headerDropdown: List[str] = []  # Tab names to show in Header dropdown
     
+    # SEO fields
+    seo_title: Optional[str] = ""
+    seo_description: Optional[str] = ""
+    focus_keyword: Optional[str] = ""
+    
     # Meta
     visible: bool = True
     createdAt: datetime = Field(default_factory=datetime.utcnow)
@@ -70,4 +75,7 @@ class HolidayPageConfigCreate(BaseModel):
     search: PageSearchConfig = PageSearchConfig()
     trending: PageTrendingConfig = PageTrendingConfig()
     headerDropdown: List[str] = []  # Tab names to show in Header dropdown
+    seo_title: Optional[str] = ""
+    seo_description: Optional[str] = ""
+    focus_keyword: Optional[str] = ""
     visible: bool = True

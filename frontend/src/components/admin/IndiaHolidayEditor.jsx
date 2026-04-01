@@ -17,6 +17,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { CSS } from '@dnd-kit/utilities';
 import { holidayPagesAPI, packagesAPI } from '../../api/client';
 import MediaGallery from './MediaGallery';
+import SeoScoreWidget from './SeoScoreWidget';
 
 const SortableTab = ({ tab, onUpdate, onDelete }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: tab.id });
@@ -79,7 +80,8 @@ const IndiaHolidayEditor = () => {
     tabs: true,
     headerDropdown: true,
     search: true,
-    trending: true
+    trending: true,
+    seo: true
   });
 
   const sensors = useSensors(
@@ -642,6 +644,32 @@ const IndiaHolidayEditor = () => {
                   </div>
                 </>
               )}
+            </div>
+          )}
+        </div>
+
+        {/* SEO Configuration */}
+        <div className="bg-white rounded-lg border">
+          <button
+            onClick={() => toggleSection('seo')}
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50"
+          >
+            <div className="flex items-center space-x-3">
+              <Search className="h-5 w-5 text-green-500" />
+              <h3 className="text-lg font-semibold">SEO Configuration</h3>
+            </div>
+            {expandedSections.seo ? <ChevronUp /> : <ChevronDown />}
+          </button>
+          
+          {expandedSections.seo && (
+            <div className="p-4 border-t" data-testid="india-seo-section">
+              <SeoScoreWidget
+                seoTitle={config.seo_title || ''}
+                seoDescription={config.seo_description || ''}
+                focusKeyword={config.focus_keyword || ''}
+                contentText={`${config.banner.title} ${config.banner.subtitle || ''} ${config.tabs.map(t => t.name).join(' ')}`}
+                onChange={(field, value) => setConfig(prev => ({ ...prev, [field]: value }))}
+              />
             </div>
           )}
         </div>

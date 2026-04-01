@@ -16,6 +16,7 @@ import {
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { packagesAPI, settingsAPI } from '../api/client';
+import { Helmet } from 'react-helmet-async';
 import html2pdf from 'html2pdf.js';
 
 const PackageDetails = () => {
@@ -151,6 +152,11 @@ const PackageDetails = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>{`${pkg?.seo_title || pkg?.title || 'Package Details'} — Suvidha Travel`}</title>
+        {pkg?.seo_description && <meta name="description" content={pkg.seo_description} />}
+        {pkg?.focus_keyword && <meta name="keywords" content={pkg.focus_keyword} />}
+      </Helmet>
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

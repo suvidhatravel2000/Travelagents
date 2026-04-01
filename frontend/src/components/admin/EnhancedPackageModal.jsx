@@ -3,6 +3,7 @@ import { X, Save, Plus, Trash2, FileText, Sparkles, Zap, Image as ImageIcon } fr
 import { smartParse } from '../../utils/packageParser';
 import { parseBulkPackageData, generatePreview } from '../../utils/bulkPackageParser';
 import MediaGallery from './MediaGallery';
+import SeoScoreWidget from './SeoScoreWidget';
 
 const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) => {
   const [activeTab, setActiveTab] = useState('bulk');
@@ -34,8 +35,18 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
     itinerary: [],
     inclusions: [],
     exclusions: [],
-    termsConditions: []
+    termsConditions: [],
+    seo_title: '',
+    seo_description: '',
+    focus_keyword: ''
   });
+
+  // Content text for SEO keyword-in-content check
+  const contentText = [
+    formData.title, formData.overview, formData.additionalInfo,
+    ...(formData.inclusions || []), ...(formData.exclusions || []),
+    ...(formData.itinerary || []).map(d => `${d.title} ${d.description}`)
+  ].join(' ');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -289,17 +300,17 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
 
           {/* Tabs */}
           <div className="flex space-x-2 overflow-x-auto">
-            {['bulk', 'basic', 'pricing', 'hotels', 'itinerary', 'includes', 'excludes', 'terms'].map(tab => (
+            {['bulk', 'basic', 'pricing', 'hotels', 'itinerary', 'includes', 'excludes', 'terms', 'seo'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-2 rounded-lg whitespace-nowrap ${
                   activeTab === tab
-                    ? tab === 'bulk' ? 'bg-purple-600 text-white' : 'bg-orange-500 text-white'
+                    ? tab === 'bulk' ? 'bg-purple-600 text-white' : tab === 'seo' ? 'bg-green-600 text-white' : 'bg-orange-500 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {tab === 'bulk' ? '⚡ Bulk Import' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === 'bulk' ? 'Bulk Import' : tab === 'seo' ? 'SEO' : tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
           </div>
@@ -1255,6 +1266,21 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
                   <p>No terms yet. Use "Smart Paste" or "Add Term" to get started.</p>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* SEO Tab */}
+          {activeTab === 'seo' && (
+            <div className="space-y-4" data-testid="package-seo-tab">
+              <h3 className="font-semibold text-lg">Search Engine Optimization</h3>
+              <p className="text-sm text-gray-500">Optimize this package for search engines. A higher score means better visibility on Google.</p>
+              <SeoScoreWidget
+                seoTitle={formData.seo_title}
+                seoDescription={formData.seo_description}
+                focusKeyword={formData.focus_keyword}
+                contentText={contentText}
+                onChange={(field, value) => setFormData({ ...formData, [field]: value })}
+              />
             </div>
           )}
 

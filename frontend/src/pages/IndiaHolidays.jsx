@@ -4,6 +4,7 @@ import { Search, Star, Calendar, MapPin, ArrowRight, Filter } from 'lucide-react
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { holidayPagesAPI, packagesAPI } from '../api/client';
+import { Helmet } from 'react-helmet-async';
 
 const IndiaHolidays = () => {
   const navigate = useNavigate();
@@ -105,9 +106,12 @@ const IndiaHolidays = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>{`${config.seo_title || 'India Holidays'} — Suvidha Travel`}</title>
+        {config.seo_description && <meta name="description" content={config.seo_description} />}
+        {config.focus_keyword && <meta name="keywords" content={config.focus_keyword} />}
+      </Helmet>
       <Header />
-
-      {/* Hero Banner */}
       <div className="relative h-[500px] bg-gray-900">
         <img
           src={config.banner.desktopImage}

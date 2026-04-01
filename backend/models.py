@@ -65,6 +65,11 @@ class PackageBase(BaseModel):
     
     # Region assignment for holiday pages
     region: Optional[str] = "india"  # "india" or "international" or "both"
+    
+    # SEO fields
+    seo_title: Optional[str] = ""
+    seo_description: Optional[str] = ""
+    focus_keyword: Optional[str] = ""
 
 class PackageCreate(PackageBase):
     pass

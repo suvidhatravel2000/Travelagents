@@ -1,5 +1,6 @@
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import Home from "./pages/Home";
 import DestinationPage from "./pages/DestinationPage";
 import PackageDetails from "./pages/PackageDetails";
@@ -14,23 +15,25 @@ import { Toaster } from "./components/ui/sonner";
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/india-holidays" element={<IndiaHolidays />} />
-          <Route path="/international-holidays" element={<InternationalHolidays />} />
-          <Route path="/destination/:destinationId" element={<DestinationPage />} />
-          <Route path="/package/:packageId" element={<PackageDetails />} />
-          <Route path="/search" element={<SearchResults />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/admin" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/cms" element={<AdminDashboardCMS />} />
-        </Routes>
-      </BrowserRouter>
-      <Toaster />
-    </div>
+    <HelmetProvider>
+      <div className="App">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/india-holidays" element={<IndiaHolidays />} />
+            <Route path="/international-holidays" element={<InternationalHolidays />} />
+            <Route path="/destination/:destinationId" element={<DestinationPage />} />
+            <Route path="/package/:packageId" element={<PackageDetails />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/cms" element={<AdminDashboardCMS />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster />
+      </div>
+    </HelmetProvider>
   );
 }
 
