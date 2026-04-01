@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -10,20 +10,24 @@ import {
   Phone, 
   Mail, 
   Clock, 
-  Check 
+  Check,
+  Download
 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { packagesAPI, settingsAPI } from '../api/client';
+import html2pdf from 'html2pdf.js';
 
 const PackageDetails = () => {
   const { packageId } = useParams();
   const navigate = useNavigate();
+  const downloadRef = useRef(null);
   
   const [pkg, setPkg] = useState(null);
   const [companyInfo, setCompanyInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,6 +50,44 @@ const PackageDetails = () => {
 
     fetchData();
   }, [packageId]);
+
+  // Download PDF function
+  const handleDownloadPDF = () => {
+    if (!downloadRef.current || !pkg) return;
+    
+    setIsDownloading(true);
+    
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: `${pkg.title.replace(/[^a-z0-9]/gi, '_')}_Details.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        letterRendering: true
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait'
+      },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    html2pdf()
+      .set(opt)
+      .from(downloadRef.current)
+      .save()
+      .then(() => {
+        setIsDownloading(false);
+      })
+      .catch((error) => {
+        console.error('PDF generation error:', error);
+        setIsDownloading(false);
+        alert('Failed to generate PDF. Please try again.');
+      });
+  };
 
   if (loading) {
     return (
@@ -110,18 +152,49 @@ const PackageDetails = () => {
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-orange-500 hover:text-orange-600 mb-6 font-medium"
-        >
-          <ArrowLeft className="h-5 w-5 mr-2" />
-          Back
-        </button>
+        {/* Back Button & Download Button */}
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-orange-500 hover:text-orange-600 font-medium"
+          >
+            <ArrowLeft className="h-5 w-5 mr-2" />
+            Back
+          </button>
+          
+          <button
+            onClick={handleDownloadPDF}
+            disabled={isDownloading}
+            className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="h-5 w-5" />
+            <span>{isDownloading ? 'Generating PDF...' : 'Download Details'}</span>
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2" ref={downloadRef}>
+            {/* PDF-specific styles */}
+            <style jsx="true">{`
+              @media print {
+                * {
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                }
+                table {
+                  page-break-inside: avoid;
+                  border-collapse: collapse !important;
+                }
+                tr {
+                  page-break-inside: avoid;
+                  page-break-after: auto;
+                }
+                thead {
+                  display: table-header-group;
+                }
+              }
+            `}</style>
             {/* Hero Image */}
             <div className="relative rounded-2xl overflow-hidden mb-6">
               <img
