@@ -122,4 +122,22 @@ export const authAPI = {
   },
 };
 
+// Holiday Pages API
+export const holidayPagesAPI = {
+  get: async (pageType) => {
+    const response = await api.get(`/pages/${pageType}`);
+    return response.data;
+  },
+  
+  update: async (pageType, config) => {
+    const response = await api.put(`/pages/${pageType}`, config);
+    return response.data;
+  },
+  
+  getAll: async () => {
+    const response = await api.get('/pages/');
+    return response.data;
+  },
+};
+
 export default api;
