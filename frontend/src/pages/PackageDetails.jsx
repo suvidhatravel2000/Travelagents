@@ -160,8 +160,8 @@ const PackageDetails = () => {
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button & Download Button */}
-        <div className="flex items-center justify-between mb-6">
+        {/* Back Button */}
+        <div className="mb-6">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center text-orange-500 hover:text-orange-600 font-medium"
@@ -169,20 +169,11 @@ const PackageDetails = () => {
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back
           </button>
-          
-          <button
-            onClick={handleDownloadPDF}
-            disabled={isDownloading}
-            className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Download className="h-5 w-5" />
-            <span>{isDownloading ? 'Generating PDF...' : 'Download Details'}</span>
-          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2" ref={downloadRef}>
+          <div className="lg:col-span-2 min-w-0" ref={downloadRef}>
             {/* PDF-specific styles */}
             <style jsx="true">{`
               @media print {
@@ -247,7 +238,7 @@ const PackageDetails = () => {
             {/* Package Title and Info */}
             <div className="bg-white rounded-lg p-6 mb-6">
               <div className="flex items-start justify-between mb-4">
-                <div>
+                <div className="flex-1 min-w-0">
                   <span className="inline-block bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium mb-3">
                     {pkg.category}
                   </span>
@@ -268,10 +259,17 @@ const PackageDetails = () => {
                     </p>
                   )}
                 </div>
+                <button
+                  onClick={handleDownloadPDF}
+                  disabled={isDownloading}
+                  className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 self-start"
+                  data-testid="download-details-btn"
+                >
+                  <Download className="h-4 w-4" />
+                  <span className="text-sm">{isDownloading ? 'Generating...' : 'Download Details'}</span>
+                </button>
               </div>
             </div>
-
-            {/* Pricing Table */}
             {pkg.pricingTable && pkg.pricingTable.length > 0 && (() => {
               // Detect if using new dynamic columns format or old fixed format
               const hasNewFormat = pkg.pricingTable.some(row => row.columns && Object.keys(row.columns).length > 0);
@@ -294,14 +292,14 @@ const PackageDetails = () => {
                     </p>
                     
                     <div className="overflow-x-auto">
-                      <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+                      <table className="w-full" style={{ borderCollapse: 'collapse', tableLayout: 'auto' }}>
                         <thead>
                           <tr style={{ backgroundColor: '#d1d5db' }}>
-                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                            <th className="border border-gray-400 px-3 py-3 text-left font-bold text-gray-900 text-sm">
                               Category
                             </th>
                             {columnHeaders.map((header, idx) => (
-                              <th key={idx} className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                              <th key={idx} className="border border-gray-400 px-3 py-3 text-left font-bold text-gray-900 text-sm">
                                 {header}
                               </th>
                             ))}
@@ -310,11 +308,11 @@ const PackageDetails = () => {
                         <tbody>
                           {pkg.pricingTable.map((row, idx) => (
                             <tr key={idx}>
-                              <td className="border border-gray-400 px-6 py-4 font-semibold text-gray-900">
+                              <td className="border border-gray-400 px-3 py-3 font-semibold text-gray-900 text-sm">
                                 {row.category}
                               </td>
                               {columnHeaders.map((header, colIdx) => (
-                                <td key={colIdx} className="border border-gray-400 px-6 py-4 text-gray-900">
+                                <td key={colIdx} className="border border-gray-400 px-3 py-3 text-gray-900 text-sm">
                                   {row.columns && row.columns[header] ? row.columns[header] : '-'}
                                 </td>
                               ))}
@@ -346,22 +344,22 @@ const PackageDetails = () => {
                     </p>
                     
                     <div className="overflow-x-auto">
-                      <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+                      <table className="w-full" style={{ borderCollapse: 'collapse', tableLayout: 'auto' }}>
                         <thead>
                           <tr style={{ backgroundColor: '#d1d5db' }}>
-                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                            <th className="border border-gray-400 px-3 py-3 text-left font-bold text-gray-900 text-sm">
                               Category
                             </th>
-                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                            <th className="border border-gray-400 px-3 py-3 text-left font-bold text-gray-900 text-sm">
                               Per Person (Min 2 Pax)
                             </th>
-                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                            <th className="border border-gray-400 px-3 py-3 text-left font-bold text-gray-900 text-sm">
                               Per Person (Min 4 Pax)
                             </th>
-                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                            <th className="border border-gray-400 px-3 py-3 text-left font-bold text-gray-900 text-sm">
                               Per Person (Min 6 Pax)
                             </th>
-                            <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                            <th className="border border-gray-400 px-3 py-3 text-left font-bold text-gray-900 text-sm">
                               Extra bed
                             </th>
                           </tr>
@@ -369,19 +367,19 @@ const PackageDetails = () => {
                         <tbody>
                           {pkg.pricingTable.map((row, idx) => (
                             <tr key={idx}>
-                              <td className="border border-gray-400 px-6 py-4 font-semibold text-gray-900">
+                              <td className="border border-gray-400 px-3 py-3 font-semibold text-gray-900 text-sm">
                                 {row.category}
                               </td>
-                              <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                              <td className="border border-gray-400 px-3 py-3 text-gray-900 text-sm">
                                 {row.price2Pax || '-'}
                               </td>
-                              <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                              <td className="border border-gray-400 px-3 py-3 text-gray-900 text-sm">
                                 {row.price4Pax || '-'}
                               </td>
-                              <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                              <td className="border border-gray-400 px-3 py-3 text-gray-900 text-sm">
                                 {row.price6Pax || '-'}
                               </td>
-                              <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                              <td className="border border-gray-400 px-3 py-3 text-gray-900 text-sm">
                                 {row.extraBed || '-'}
                               </td>
                             </tr>
@@ -411,21 +409,21 @@ const PackageDetails = () => {
               <div className="bg-white rounded-lg p-6 mb-6">
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">Hotel Details</h2>
                 <div className="overflow-x-auto">
-                  <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+                  <table className="w-full" style={{ borderCollapse: 'collapse', tableLayout: 'auto' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#d1d5db' }}>
-                        <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900 w-1/4">
+                        <th className="border border-gray-400 px-3 py-3 text-left font-bold text-gray-900 text-sm" style={{ minWidth: '100px' }}>
                           Category
                         </th>
                         {/* Dynamic location columns */}
                         {pkg.hotelDetails[0]?.locations && Object.keys(pkg.hotelDetails[0].locations).map((location) => (
-                          <th key={location} className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                          <th key={location} className="border border-gray-400 px-3 py-3 text-left font-bold text-gray-900 text-sm">
                             {location}
                           </th>
                         ))}
                         {/* Fallback to single column if no locations */}
                         {!pkg.hotelDetails[0]?.locations && (
-                          <th className="border border-gray-400 px-6 py-4 text-left font-bold text-gray-900">
+                          <th className="border border-gray-400 px-3 py-3 text-left font-bold text-gray-900 text-sm">
                             Hotel
                           </th>
                         )}
@@ -434,18 +432,18 @@ const PackageDetails = () => {
                     <tbody>
                       {pkg.hotelDetails.map((hotel, idx) => (
                         <tr key={idx}>
-                          <td className="border border-gray-400 px-6 py-4 font-semibold text-gray-900">
+                          <td className="border border-gray-400 px-3 py-3 font-semibold text-gray-900 text-sm">
                             {hotel.category}
                           </td>
                           {/* Multi-column format */}
                           {hotel.locations && Object.values(hotel.locations).map((hotelName, locIdx) => (
-                            <td key={locIdx} className="border border-gray-400 px-6 py-4 text-gray-900">
+                            <td key={locIdx} className="border border-gray-400 px-3 py-3 text-gray-900 text-sm">
                               {hotelName}
                             </td>
                           ))}
                           {/* Single column format (backward compatible) */}
                           {!hotel.locations && (
-                            <td className="border border-gray-400 px-6 py-4 text-gray-900">
+                            <td className="border border-gray-400 px-3 py-3 text-gray-900 text-sm">
                               {hotel.hotelName}
                             </td>
                           )}
