@@ -60,7 +60,7 @@ app.add_middleware(
 from fastapi.responses import FileResponse
 from fastapi import HTTPException
 
-@app.get("/uploads/{file_path:path}")
+@app.get("/api/uploads/{file_path:path}")
 async def serve_uploads(file_path: str):
     """Serve uploaded files with proper CORS headers"""
     file_location = f"/app/uploads/{file_path}"

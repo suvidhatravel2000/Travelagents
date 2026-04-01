@@ -43,7 +43,7 @@ async def upload_images(
             shutil.copyfileobj(file.file, buffer)
         
         # Create URL path (frontend will use REACT_APP_BACKEND_URL)
-        file_url = f"/uploads/{unique_filename}"
+        file_url = f"/api/uploads/{unique_filename}"
         
         # Save to database
         media_item = {
