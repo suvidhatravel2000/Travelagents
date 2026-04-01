@@ -84,19 +84,53 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
   const addPricingRow = () => {
     setFormData({
       ...formData,
-      pricingTable: [...formData.pricingTable, { category: '', price2Pax: 0, price4Pax: 0, price6Pax: 0, extraBed: 0 }]
+      pricingTable: [...formData.pricingTable, { category: '', columns: {} }]
     });
   };
 
   const updatePricing = (index, field, value) => {
     const newPricing = [...formData.pricingTable];
-    newPricing[index][field] = field === 'category' ? value : parseInt(value) || 0;
+    
+    if (field === 'category') {
+      newPricing[index][field] = value;
+    } else if (field.startsWith('column_')) {
+      // Update dynamic column
+      const columnName = field.replace('column_', '');
+      if (!newPricing[index].columns) {
+        newPricing[index].columns = {};
+      }
+      newPricing[index].columns[columnName] = value;
+    } else {
+      // Legacy fixed columns support (for backward compatibility)
+      newPricing[index][field] = parseInt(value) || 0;
+    }
+    
     setFormData({ ...formData, pricingTable: newPricing });
   };
 
   const removePricingRow = (index) => {
     const newPricing = formData.pricingTable.filter((_, i) => i !== index);
     setFormData({ ...formData, pricingTable: newPricing });
+  };
+
+  const addPricingColumn = (rowIndex) => {
+    const columnName = prompt('Enter column name (e.g., "2 Pax", "4 Pax", "Extra Bed"):');
+    if (columnName && columnName.trim()) {
+      const newPricing = [...formData.pricingTable];
+      if (!newPricing[rowIndex].columns) {
+        newPricing[rowIndex].columns = {};
+      }
+      newPricing[rowIndex].columns[columnName.trim()] = '';
+      setFormData({ ...formData, pricingTable: newPricing });
+    }
+  };
+
+  const removePricingColumn = (rowIndex, columnName) => {
+    const newPricing = [...formData.pricingTable];
+    if (newPricing[rowIndex].columns) {
+      delete newPricing[rowIndex].columns[columnName];
+      setFormData({ ...formData, pricingTable: newPricing });
+    }
   };
 
   // Hotel details handlers
@@ -617,43 +651,91 @@ const EnhancedPackageModal = ({ package: pkg, destinations, onSave, onClose }) =
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
-                  <div className="grid grid-cols-5 gap-2">
+                  
+                  {/* Category Input */}
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">Category</label>
                     <input
                       type="text"
-                      placeholder="Category"
+                      placeholder="Category (e.g., Standard, Deluxe, Premium)"
                       value={row.category}
                       onChange={(e) => updatePricing(idx, 'category', e.target.value)}
-                      className="px-3 py-2 border rounded text-sm"
-                    />
-                    <input
-                      type="number"
-                      placeholder="2 Pax"
-                      value={row.price2Pax}
-                      onChange={(e) => updatePricing(idx, 'price2Pax', e.target.value)}
-                      className="px-3 py-2 border rounded text-sm"
-                    />
-                    <input
-                      type="number"
-                      placeholder="4 Pax"
-                      value={row.price4Pax}
-                      onChange={(e) => updatePricing(idx, 'price4Pax', e.target.value)}
-                      className="px-3 py-2 border rounded text-sm"
-                    />
-                    <input
-                      type="number"
-                      placeholder="6 Pax"
-                      value={row.price6Pax}
-                      onChange={(e) => updatePricing(idx, 'price6Pax', e.target.value)}
-                      className="px-3 py-2 border rounded text-sm"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Extra Bed"
-                      value={row.extraBed}
-                      onChange={(e) => updatePricing(idx, 'extraBed', e.target.value)}
-                      className="px-3 py-2 border rounded text-sm"
+                      className="w-full px-3 py-2 border rounded text-sm"
                     />
                   </div>
+
+                  {/* Dynamic Columns */}
+                  {row.columns && Object.keys(row.columns).length > 0 && (
+                    <div className="space-y-2">
+                      <label className="text-xs text-gray-600">Pricing Columns</label>
+                      {Object.entries(row.columns).map(([columnName, value]) => (
+                        <div key={columnName} className="flex items-center space-x-2">
+                          <span className="text-xs font-semibold text-gray-700 w-32 flex-shrink-0">
+                            {columnName}:
+                          </span>
+                          <input
+                            type="text"
+                            placeholder="Price or value"
+                            value={value}
+                            onChange={(e) => updatePricing(idx, `column_${columnName}`, e.target.value)}
+                            className="flex-1 px-3 py-2 border rounded text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removePricingColumn(idx, columnName)}
+                            className="text-red-500 hover:text-red-700"
+                            title="Remove this column"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Legacy Fixed Columns (Backward Compatibility) */}
+                  {row.price2Pax !== undefined && !row.columns && (
+                    <div className="grid grid-cols-4 gap-2">
+                      <input
+                        type="number"
+                        placeholder="2 Pax"
+                        value={row.price2Pax}
+                        onChange={(e) => updatePricing(idx, 'price2Pax', e.target.value)}
+                        className="px-3 py-2 border rounded text-sm"
+                      />
+                      <input
+                        type="number"
+                        placeholder="4 Pax"
+                        value={row.price4Pax}
+                        onChange={(e) => updatePricing(idx, 'price4Pax', e.target.value)}
+                        className="px-3 py-2 border rounded text-sm"
+                      />
+                      <input
+                        type="number"
+                        placeholder="6 Pax"
+                        value={row.price6Pax}
+                        onChange={(e) => updatePricing(idx, 'price6Pax', e.target.value)}
+                        className="px-3 py-2 border rounded text-sm"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Extra Bed"
+                        value={row.extraBed}
+                        onChange={(e) => updatePricing(idx, 'extraBed', e.target.value)}
+                        className="px-3 py-2 border rounded text-sm"
+                      />
+                    </div>
+                  )}
+
+                  {/* Add Column Button */}
+                  <button
+                    type="button"
+                    onClick={() => addPricingColumn(idx)}
+                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+                  >
+                    <Plus className="h-3 w-3" />
+                    <span>Add Pricing Column</span>
+                  </button>
                 </div>
               ))}
 
