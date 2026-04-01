@@ -140,4 +140,37 @@ export const holidayPagesAPI = {
   },
 };
 
+// Blog API
+export const blogAPI = {
+  getAll: async (params = {}) => {
+    const response = await api.get('/blog/', { params });
+    return response.data;
+  },
+
+  getById: async (id) => {
+    const response = await api.get(`/blog/${id}`);
+    return response.data;
+  },
+
+  getCategories: async () => {
+    const response = await api.get('/blog/categories');
+    return response.data;
+  },
+
+  create: async (postData) => {
+    const response = await api.post('/blog/', postData);
+    return response.data;
+  },
+
+  update: async (id, postData) => {
+    const response = await api.put(`/blog/${id}`, postData);
+    return response.data;
+  },
+
+  delete: async (id) => {
+    const response = await api.delete(`/blog/${id}`);
+    return response.data;
+  },
+};
+
 export default api;

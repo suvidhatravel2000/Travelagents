@@ -8,6 +8,7 @@ import IndiaHolidays from "./pages/IndiaHolidays";
 import InternationalHolidays from "./pages/InternationalHolidays";
 import SearchResults from "./pages/SearchResults";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminDashboardCMS from "./pages/AdminDashboardCMS";
@@ -26,6 +27,7 @@ function App() {
             <Route path="/package/:packageId" element={<PackageDetails />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/admin" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/cms" element={<AdminDashboardCMS />} />

@@ -10,6 +10,7 @@ from pathlib import Path
 # Import routes
 from routes import packages, destinations, banners, settings, auth, media, pages
 from routes import cms_topbar, cms_footer, cms_homepage
+from routes import blog
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -45,6 +46,7 @@ app.include_router(cms_footer.router)
 app.include_router(cms_homepage.router)
 app.include_router(media.router)
 app.include_router(pages.router)
+app.include_router(blog.router)
 app.include_router(api_router)
 
 app.add_middleware(

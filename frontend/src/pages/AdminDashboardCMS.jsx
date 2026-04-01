@@ -13,7 +13,8 @@ import {
   EyeOff,
   Save,
   Plane,
-  Globe
+  Globe,
+  FileText
 } from 'lucide-react';
 import { packagesAPI, destinationsAPI, bannersAPI, settingsAPI, authAPI } from '../api/client';
 import { cmsAPI } from '../api/cms';
@@ -30,6 +31,7 @@ import TrendingPackagesEditor from '../components/admin/TrendingPackagesEditor';
 import MediaGallery from '../components/admin/MediaGallery';
 import IndiaHolidayEditor from '../components/admin/IndiaHolidayEditor';
 import InternationalHolidayEditor from '../components/admin/InternationalHolidayEditor';
+import BlogManager from '../components/admin/BlogManager';
 
 const AdminDashboardCMS = () => {
   const navigate = useNavigate();
@@ -209,7 +211,19 @@ const AdminDashboardCMS = () => {
             }`}
           >
             <Globe className="h-5 w-5" />
-            <span>🌍 International Holidays</span>
+            <span>International Holidays</span>
+          </button>
+
+          {/* Blog Button */}
+          <button
+            onClick={() => setActiveTab('blog')}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              activeTab === 'blog' ? 'bg-orange-500' : 'hover:bg-gray-800'
+            }`}
+            data-testid="sidebar-blog-btn"
+          >
+            <FileText className="h-5 w-5" />
+            <span>Blog</span>
           </button>
 
           {/* Media Gallery Button */}
@@ -262,6 +276,7 @@ const AdminDashboardCMS = () => {
             {activeTab === 'visibility' && 'Section Visibility'}
             {activeTab === 'india-holidays' && 'India Holiday Page'}
             {activeTab === 'international-holidays' && 'International Holiday Page'}
+            {activeTab === 'blog' && 'Blog Management'}
             {activeTab === 'settings' && 'Company Settings'}
           </h1>
           <p className="text-gray-600 mt-1">Manage your website content and appearance</p>
@@ -332,6 +347,7 @@ const AdminDashboardCMS = () => {
         {activeTab === 'visibility' && <SectionVisibilityControl />}
         {activeTab === 'india-holidays' && <IndiaHolidayEditor />}
         {activeTab === 'international-holidays' && <InternationalHolidayEditor />}
+        {activeTab === 'blog' && <BlogManager />}
 
       {/* Media Gallery Modal */}
       {showMediaGallery && (
